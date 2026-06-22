@@ -98,7 +98,9 @@ body {
 }
 
 button,
-textarea {
+textarea,
+input,
+select {
   font: inherit;
 }
 
@@ -107,7 +109,9 @@ button {
 }
 
 button:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+input:focus-visible,
+select:focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -461,6 +465,7 @@ p {
 .free-grid,
 .audio-grid,
 .dashboard-grid,
+.club-grid,
 .theme-grid,
 .plan-grid,
 .program-grid,
@@ -481,6 +486,76 @@ p {
 
 .dashboard-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.club-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.club-meta,
+.profile-list,
+.profile-form {
+  display: grid;
+  gap: 10px;
+}
+
+.club-meta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 14px 0;
+}
+
+.club-meta span {
+  padding: 10px 12px;
+  color: var(--muted);
+  font-weight: 800;
+  background: var(--surface-soft);
+  border-radius: var(--radius);
+}
+
+.profile-list button {
+  min-height: 58px;
+  padding: 12px 14px;
+  text-align: left;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.profile-list button.is-active {
+  border-color: var(--primary);
+  box-shadow: inset 4px 0 0 var(--primary);
+}
+
+.profile-list span,
+.profile-list small,
+.profile-form label span {
+  display: block;
+}
+
+.profile-list span,
+.profile-form label span {
+  font-weight: 850;
+}
+
+.profile-list small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.profile-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.profile-form input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
 }
 
 .program-grid {
@@ -1204,6 +1279,7 @@ summary {
   .audio-grid,
   .audio-controls,
   .dashboard-grid,
+  .club-grid,
   .program-items,
   .program-priority-list,
   .quick-grid {
@@ -1260,9 +1336,14 @@ summary {
   .audio-grid,
   .audio-controls,
   .dashboard-grid,
+  .club-grid,
   .program-items,
   .program-priority-list,
   .quick-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .club-meta {
     grid-template-columns: 1fr;
   }
 

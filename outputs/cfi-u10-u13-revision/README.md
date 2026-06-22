@@ -39,6 +39,10 @@ Le projet est une application statique : aucun build n'est nécessaire. Les fich
 
 ## Modes disponibles
 
+- Espace club :
+  plusieurs éducateurs peuvent utiliser la même application avec des profils séparés. Chaque profil conserve sa progression, ses scores, ses erreurs et ses QCM.
+- Diagnostic initial :
+  test court et mélangé pour identifier rapidement les thèmes forts et les thèmes faibles avant de lancer la révision.
 - Programme CFI :
   la page reprend les modules et fichiers du parcours fourni, puis les relie aux thèmes, fiches, QCM, audios et mises en situation de l'application.
 - Révision intensive 3 jours :
@@ -47,6 +51,10 @@ Le projet est une application statique : aucun build n'est nécessaire. Les fich
   Jour 3 sert à faire le QCM complet, reprendre les mises en situation, revoir violence/discrimination et faire le bilan.
 - Révision libre :
   l'utilisateur choisit ses thèmes, refait les QCM, écoute les fiches, révise 10 minutes ou plusieurs heures, et reprend automatiquement sa progression.
+- Révision des points faibles :
+  l'application génère une session ciblée à partir des thèmes non maîtrisés et des scores insuffisants.
+- QCM blanc final :
+  session de 40 questions mélangées avec indication de préparation : prêt, presque prêt ou à revoir avant certification.
 - Révision audio rapide :
   l'utilisateur peut écouter un thème ou enchaîner tous les résumés audio, choisir une voix française si disponible, régler la vitesse, régler la tonalité, mettre en pause et reprendre.
 - Entraînement oral :
@@ -62,15 +70,24 @@ Le tableau de bord affiche :
 - meilleurs thèmes ;
 - thèmes à revoir ;
 - dernière session ;
+- diagnostic initial ;
+- QCM blanc final ;
+- questions maîtrisées ;
+- temps de révision conseillé ;
 - bouton pour continuer ;
+- bouton pour réviser les points faibles ;
+- bouton pour faire un QCM blanc ;
 - bouton pour réinitialiser la progression locale.
 
 ## Boutons principaux
 
 - `Réviser librement` : ouvre le mode libre.
 - `Continuer ma progression` : reprend le dernier écran utile ou propose le prochain thème.
+- `Diagnostic` : lance un test court pour situer le niveau du profil actif.
+- `Points faibles` : lance un QCM ciblé sur les thèmes à revoir.
 - `Revoir mes erreurs` : lance un QCM uniquement sur les questions ratées mémorisées.
 - `Faire un QCM complet` : lance toutes les questions disponibles.
+- `QCM blanc final` : lance une session certification avec objectif 80 % minimum.
 - `Sombre` / `Clair` : bascule l'interface en mode sombre ou clair. Le choix est sauvegardé dans le navigateur.
 - `Réinitialiser ma progression` : efface les données locales après confirmation.
 

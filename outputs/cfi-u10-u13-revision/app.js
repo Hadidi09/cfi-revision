@@ -2,11 +2,15 @@
   "use strict";
 
   const DATA = window.CFI_REVISION_DATA;
-  const STORAGE_KEY = "cfi-u10-u13-progress-v1";
+  const LEGACY_STORAGE_KEY = "cfi-u10-u13-progress-v1";
+  const STORAGE_KEY_PREFIX = "cfi-u10-u13-progress-v2";
+  const PROFILES_KEY = "cfi-u10-u13-club-profiles-v1";
   const THEME_KEY = "cfi-u10-u13-theme";
   const app = document.querySelector("#app");
   const toast = document.querySelector("#toast");
 
+  let profileStore = loadProfileStore();
+  let activeProfile = currentProfile();
   let progress = loadProgress();
   let quizSession = null;
   let availableVoices = [];
@@ -20,6 +24,10 @@
       missedQuestions: {},
       fullQuizAttempts: [],
       errorQuizAttempts: [],
+      diagnosticAttempts: [],
+      finalQuizAttempts: [],
+      weakQuizAttempts: [],
+      questionStats: {},
       lastRoute: null,
       activeQuiz: null,
       oralTraining: {},
@@ -31,9 +39,91 @@
     };
   }
 
+  function makeId(prefix = "coach") {
+    return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  function progressKeyFor(profileId) {
+    return `${STORAGE_KEY_PREFIX}:${profileId}`;
+  }
+
+  function newProfile(name = "Éducateur", club = "Club amateur", role = "U10-U13") {
+    const now = new Date().toISOString();
+    return {
+      id: makeId(),
+      name,
+      club,
+      role,
+      createdAt: now,
+      lastUsedAt: now
+    };
+  }
+
+  function normalizeProfileStore(saved) {
+    const profiles = Array.isArray(saved?.profiles) && saved.profiles.length
+      ? saved.profiles.map((profile) => ({
+          id: profile.id || makeId(),
+          name: profile.name || "Éducateur",
+          club: profile.club || "Club amateur",
+          role: profile.role || "U10-U13",
+          createdAt: profile.createdAt || new Date().toISOString(),
+          lastUsedAt: profile.lastUsedAt || profile.createdAt || new Date().toISOString()
+        }))
+      : [newProfile()];
+
+    const activeProfileId = profiles.some((profile) => profile.id === saved?.activeProfileId)
+      ? saved.activeProfileId
+      : profiles[0].id;
+
+    return { version: 1, profiles, activeProfileId };
+  }
+
+  function loadProfileStore() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PROFILES_KEY));
+      if (saved?.version === 1) {
+        return normalizeProfileStore(saved);
+      }
+    } catch (error) {
+      console.warn("Profils illisibles, création d'un profil local.", error);
+    }
+
+    const profile = newProfile();
+    const store = { version: 1, profiles: [profile], activeProfileId: profile.id };
+    try {
+      const legacyProgress = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacyProgress) {
+        localStorage.setItem(progressKeyFor(profile.id), legacyProgress);
+      }
+      localStorage.setItem(PROFILES_KEY, JSON.stringify(store));
+    } catch (error) {
+      console.warn("Migration du profil non sauvegardée.", error);
+    }
+    return store;
+  }
+
+  function saveProfileStore() {
+    try {
+      localStorage.setItem(PROFILES_KEY, JSON.stringify(profileStore));
+    } catch (error) {
+      console.warn("Profils non sauvegardés.", error);
+    }
+  }
+
+  function currentProfile() {
+    let profile = profileStore.profiles.find((item) => item.id === profileStore.activeProfileId);
+    if (!profile) {
+      profile = profileStore.profiles[0] || newProfile();
+      profileStore.profiles = [profile];
+      profileStore.activeProfileId = profile.id;
+      saveProfileStore();
+    }
+    return profile;
+  }
+
   function loadProgress() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const saved = JSON.parse(localStorage.getItem(progressKeyFor(activeProfile.id)));
       if (saved && saved.version === 1 && saved.themes) {
         return normalizeProgress(saved);
       }
@@ -52,6 +142,10 @@
       missedQuestions: saved.missedQuestions || {},
       fullQuizAttempts: saved.fullQuizAttempts || [],
       errorQuizAttempts: saved.errorQuizAttempts || [],
+      diagnosticAttempts: saved.diagnosticAttempts || [],
+      finalQuizAttempts: saved.finalQuizAttempts || [],
+      weakQuizAttempts: saved.weakQuizAttempts || [],
+      questionStats: saved.questionStats || {},
       lastRoute: saved.lastRoute || null,
       activeQuiz: saved.activeQuiz || null,
       oralTraining: saved.oralTraining || {},
@@ -65,10 +159,44 @@
 
   function saveProgress() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      activeProfile.lastUsedAt = new Date().toISOString();
+      profileStore.activeProfileId = activeProfile.id;
+      saveProfileStore();
+      localStorage.setItem(progressKeyFor(activeProfile.id), JSON.stringify(progress));
     } catch (error) {
       console.warn("Progression non sauvegardée.", error);
     }
+  }
+
+  function switchProfile(profileId) {
+    const nextProfile = profileStore.profiles.find((profile) => profile.id === profileId);
+    if (!nextProfile || nextProfile.id === activeProfile.id) return;
+    saveProgress();
+    activeProfile = nextProfile;
+    profileStore.activeProfileId = nextProfile.id;
+    nextProfile.lastUsedAt = new Date().toISOString();
+    saveProfileStore();
+    progress = loadProgress();
+    quizSession = null;
+    window.speechSynthesis?.cancel();
+    showToast(`Profil actif : ${activeProfile.name}`);
+    setRoute("dashboard");
+  }
+
+  function createProfileFromForm() {
+    const name = document.querySelector("[data-profile-name]")?.value.trim() || "Éducateur";
+    const club = document.querySelector("[data-profile-club]")?.value.trim() || activeProfile.club || "Club amateur";
+    const role = document.querySelector("[data-profile-role]")?.value.trim() || "U10-U13";
+    const profile = newProfile(name, club, role);
+    profileStore.profiles.push(profile);
+    profileStore.activeProfileId = profile.id;
+    saveProfileStore();
+    activeProfile = profile;
+    progress = defaultProgress();
+    saveProgress();
+    quizSession = null;
+    showToast(`Profil créé : ${profile.name}`);
+    setRoute("dashboard");
   }
 
   function storedTheme() {
@@ -218,13 +346,28 @@
       type: "full",
       label: "QCM complet"
     }));
+    const diagnosticAttempts = (progress.diagnosticAttempts || []).map((attempt) => ({
+      ...attempt,
+      type: "diagnostic",
+      label: "Diagnostic initial"
+    }));
+    const finalAttempts = (progress.finalQuizAttempts || []).map((attempt) => ({
+      ...attempt,
+      type: "final",
+      label: "QCM blanc final"
+    }));
+    const weakAttempts = (progress.weakQuizAttempts || []).map((attempt) => ({
+      ...attempt,
+      type: "weak",
+      label: "Points faibles"
+    }));
     const errorAttempts = (progress.errorQuizAttempts || []).map((attempt) => ({
       ...attempt,
       type: "errors",
       label: "Questions ratées"
     }));
 
-    return [...themeAttempts, ...fullAttempts, ...errorAttempts].sort(
+    return [...themeAttempts, ...fullAttempts, ...diagnosticAttempts, ...finalAttempts, ...weakAttempts, ...errorAttempts].sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
   }
@@ -272,6 +415,34 @@
       .slice(0, limit);
   }
 
+  function masteryLevel(theme) {
+    const best = bestAttempt(theme.id);
+    const score = best ? scorePercent(best) : null;
+    const value = themeProgress(theme);
+    if (score !== null && score >= 85 && value >= 85) return "Prêt certification";
+    if (score !== null && score >= DATA.passScore) return "Solide";
+    if (value >= 35 || score !== null) return "En progrès";
+    return "Débutant";
+  }
+
+  function estimatedRevisionTime() {
+    const weakCount = weakThemes(DATA.themes.length).length;
+    const unreadCount = DATA.themes.filter((theme) => !themeState(theme.id).read).length;
+    const minutes = 20 + weakCount * 12 + unreadCount * 8 + missedQuestionItems().length * 2;
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const rest = minutes % 60;
+    return rest ? `${hours}h${String(rest).padStart(2, "0")}` : `${hours}h`;
+  }
+
+  function encouragementMessage() {
+    const stats = globalStats();
+    if (stats.globalProgress >= 85) return "Très solide : garde le rythme et finis par un QCM blanc.";
+    if (missedQuestionItems().length) return "Bon axe de travail : reprends les erreurs, elles te donnent le plan.";
+    if (!latestDiagnosticAttempt()) return "Commence par un diagnostic court pour savoir où appuyer.";
+    return "Avance par blocs courts : fiche, QCM, correction, puis une situation terrain.";
+  }
+
   function allQuestionItems() {
     return DATA.themes.flatMap((theme) =>
       theme.quiz.map((question, questionIndex) => ({
@@ -296,6 +467,47 @@
   function missedQuestionItems() {
     const missedIds = new Set(Object.keys(progress.missedQuestions || {}));
     return allQuestionItems().filter((item) => missedIds.has(item.id));
+  }
+
+  function balancedQuestionSample(limit) {
+    const picked = [];
+    const used = new Set();
+    for (const theme of DATA.themes) {
+      const item = shuffled(
+        theme.quiz.map((question, questionIndex) => ({
+          id: `${theme.id}:${questionIndex}`,
+          themeId: theme.id,
+          themeTitle: theme.title,
+          questionIndex,
+          question
+        }))
+      )[0];
+      if (item && !used.has(item.id)) {
+        picked.push(item);
+        used.add(item.id);
+      }
+    }
+
+    const rest = shuffled(allQuestionItems().filter((item) => !used.has(item.id)));
+    return [...picked, ...rest].slice(0, limit);
+  }
+
+  function weakQuestionItems(limit = 24) {
+    const weakIds = new Set(weakThemes(DATA.themes.length).map((item) => item.theme.id));
+    const items = allQuestionItems().filter((item) => weakIds.has(item.themeId));
+    return shuffled(items.length ? items : allQuestionItems()).slice(0, limit);
+  }
+
+  function diagnosticQuestionItems() {
+    return balancedQuestionSample(18);
+  }
+
+  function finalExamQuestionItems() {
+    return balancedQuestionSample(40);
+  }
+
+  function masteredQuestionCount() {
+    return Object.values(progress.questionStats || {}).filter((item) => item.correctStreak >= 2).length;
   }
 
   function questionItemById(id) {
@@ -344,6 +556,16 @@
 
   function latestFullAttempt() {
     const attempts = progress.fullQuizAttempts || [];
+    return attempts.length ? attempts[attempts.length - 1] : null;
+  }
+
+  function latestDiagnosticAttempt() {
+    const attempts = progress.diagnosticAttempts || [];
+    return attempts.length ? attempts[attempts.length - 1] : null;
+  }
+
+  function latestFinalAttempt() {
+    const attempts = progress.finalQuizAttempts || [];
     return attempts.length ? attempts[attempts.length - 1] : null;
   }
 
@@ -682,6 +904,81 @@
     `;
   }
 
+  function renderClub() {
+    const stats = globalStats();
+    const attempts = allAttemptRecords();
+    app.innerHTML = `
+      <section class="page-title club-hero">
+        <span class="eyebrow">Espace club</span>
+        <h1>Plusieurs éducateurs, chacun sa progression</h1>
+        <p>Chaque profil garde ses scores, ses erreurs, son diagnostic et son parcours. Pratique quand plusieurs éducateurs du club révisent sur le même ordinateur ou téléphone.</p>
+        <div class="hero-actions">
+          <button class="btn primary large" type="button" data-continue-progress>Continuer ${esc(activeProfile.name)}</button>
+          <button class="btn secondary large" type="button" data-start-diagnostic>Diagnostic</button>
+          <button class="btn ghost large" type="button" data-route="dashboard">Tableau de bord</button>
+        </div>
+      </section>
+
+      <section class="club-grid">
+        <article class="read-panel">
+          <span class="eyebrow">Profil actif</span>
+          <h2>${esc(activeProfile.name)}</h2>
+          <div class="club-meta">
+            <span>${esc(activeProfile.club)}</span>
+            <span>${esc(activeProfile.role)}</span>
+            <span>${attempts.length} QCM</span>
+          </div>
+          ${progressBar(stats.globalProgress, "Progression du profil actif")}
+          <p>${esc(encouragementMessage())}</p>
+        </article>
+
+        <article class="read-panel">
+          <span class="eyebrow">Changer d'éducateur</span>
+          <h2>Profils du club</h2>
+          <div class="profile-list">
+            ${profileStore.profiles
+              .map(
+                (profile) => `
+                  <button type="button" class="${profile.id === activeProfile.id ? "is-active" : ""}" data-switch-profile="${esc(profile.id)}">
+                    <span>${esc(profile.name)}</span>
+                    <small>${esc(profile.club)} · ${esc(profile.role)}</small>
+                  </button>
+                `
+              )
+              .join("")}
+          </div>
+        </article>
+
+        <article class="read-panel">
+          <span class="eyebrow">Nouveau profil</span>
+          <h2>Ajouter un éducateur</h2>
+          <div class="profile-form">
+            <label>
+              <span>Nom</span>
+              <input type="text" data-profile-name placeholder="Ex : Karim">
+            </label>
+            <label>
+              <span>Club</span>
+              <input type="text" data-profile-club value="${esc(activeProfile.club)}">
+            </label>
+            <label>
+              <span>Groupe</span>
+              <input type="text" data-profile-role value="U10-U13">
+            </label>
+            <button class="btn primary large" type="button" data-create-profile>Créer le profil</button>
+          </div>
+        </article>
+
+        <article class="read-panel warning">
+          <span class="eyebrow">Repère commun</span>
+          <h2>Répondre dans l'esprit FFF</h2>
+          <p>Avant de choisir une réponse, cherche toujours : sécurité, plaisir, adaptation, respect, bienveillance, progression et apprentissage par le jeu.</p>
+          ${list(["Sécuriser d'abord", "Faire jouer et inclure", "Observer avant de corriger", "Valoriser l'effort", "Refuser violence et discrimination"], "check-list")}
+        </article>
+      </section>
+    `;
+  }
+
   function renderDashboard() {
     const stats = globalStats();
     const attempts = allAttemptRecords();
@@ -689,14 +986,19 @@
     const best = bestThemes();
     const weak = weakThemes();
     const missedCount = missedQuestionItems().length;
+    const diagnostic = latestDiagnosticAttempt();
+    const final = latestFinalAttempt();
 
     app.innerHTML = `
       <section class="page-title dashboard-hero">
-        <span class="eyebrow">Tableau de bord</span>
+        <span class="eyebrow">Tableau de bord · ${esc(activeProfile.name)}</span>
         <h1>Où tu en es</h1>
-        <p>Un point rapide pour savoir quoi faire maintenant : continuer, revoir les erreurs ou consolider les thèmes faibles.</p>
+        <p>${esc(encouragementMessage())}</p>
         <div class="hero-actions">
           <button class="btn primary large" type="button" data-continue-progress>Continuer</button>
+          <button class="btn secondary large" type="button" data-start-diagnostic>Diagnostic</button>
+          <button class="btn secondary large" type="button" data-start-weak-qcm>Points faibles</button>
+          <button class="btn secondary large" type="button" data-start-final-qcm>QCM blanc</button>
           <button class="btn secondary large" type="button" data-start-errors>Revoir mes erreurs${missedCount ? ` (${missedCount})` : ""}</button>
           <button class="btn secondary large" type="button" data-route="program">Programme CFI</button>
           <button class="btn ghost large" type="button" data-reset-progress>Réinitialiser ma progression</button>
@@ -724,6 +1026,26 @@
           <strong>${stats.completed}/${DATA.themes.length}</strong>
           <small>Fiche, QCM et situations</small>
         </article>
+        <article class="stat-card">
+          <span class="stat-label">Questions maîtrisées</span>
+          <strong>${masteredQuestionCount()}</strong>
+          <small>Deux bonnes réponses de suite</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Temps conseillé</span>
+          <strong>${esc(estimatedRevisionTime())}</strong>
+          <small>Selon erreurs et thèmes faibles</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Diagnostic</span>
+          <strong>${diagnostic ? pct(scorePercent(diagnostic)) : "À faire"}</strong>
+          <small>${diagnostic ? "Dernier score" : "Point de départ conseillé"}</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">QCM blanc</span>
+          <strong>${final ? pct(scorePercent(final)) : "À faire"}</strong>
+          <small>${final ? "Dernier score final" : "Objectif 80% minimum"}</small>
+        </article>
       </section>
 
       <section class="dashboard-grid">
@@ -735,6 +1057,18 @@
           <h2>Thèmes à revoir</h2>
           ${themeList(weak, "Aucun thème faible détecté.")}
         </article>
+        <article class="read-panel">
+          <h2>Badges de maîtrise</h2>
+          ${list([
+            `${stats.completed} thème${stats.completed > 1 ? "s" : ""} terminé${stats.completed > 1 ? "s" : ""}`,
+            `${masteredQuestionCount()} question${masteredQuestionCount() > 1 ? "s" : ""} maîtrisée${masteredQuestionCount() > 1 ? "s" : ""}`,
+            final && scorePercent(final) >= 80 ? "QCM blanc validé" : "QCM blanc à valider"
+          ], "check-list")}
+        </article>
+        <article class="read-panel accent">
+          <h2>Méthode FFF</h2>
+          <p>Pour les QCM et l'oral : sécuriser, inclure, adapter, encourager, cadrer simplement, former avant de chercher le résultat.</p>
+        </article>
       </section>
     `;
   }
@@ -744,13 +1078,17 @@
     const nextTheme = DATA.themes.find((theme) => !isThemeCompleted(theme)) || DATA.themes[0];
     const missedCount = missedQuestionItems().length;
     const fullAttempt = latestFullAttempt();
+    const diagnostic = latestDiagnosticAttempt();
     app.innerHTML = `
       <section class="hero-panel">
         <div>
-          <span class="eyebrow">Programme interactif</span>
+          <span class="eyebrow">${esc(activeProfile.club)} · ${esc(activeProfile.name)}</span>
           <h1>${esc(DATA.title)}</h1>
           <p>${esc(DATA.intro)} Choisis un mode court si tu as peu de temps, ou lance un QCM complet pour te tester comme avant une certification.</p>
           <div class="hero-actions">
+            <button class="btn primary large" type="button" data-start-diagnostic>
+              ${diagnostic ? "Refaire le diagnostic" : "Faire le diagnostic"}
+            </button>
             <button class="btn primary large" type="button" data-route="free">
               Réviser librement
             </button>
@@ -791,6 +1129,10 @@
           <strong>Continuer ma progression</strong>
           <span>Reprendre le dernier écran utile ou le prochain thème</span>
         </button>
+        <button class="quick-action" type="button" data-route="club">
+          <strong>Espace club</strong>
+          <span>Changer d'éducateur ou créer un profil</span>
+        </button>
         <button class="quick-action" type="button" data-route="free">
           <strong>Réviser librement</strong>
           <span>Choisir un thème, une durée ou un mode</span>
@@ -806,6 +1148,14 @@
         <button class="quick-action" type="button" data-start-full-qcm>
           <strong>Faire un QCM complet</strong>
           <span>${fullAttempt ? `Dernier score ${pct(scorePercent(fullAttempt))}` : `${allQuestionItems().length} questions sur tous les thèmes`}</span>
+        </button>
+        <button class="quick-action" type="button" data-start-final-qcm>
+          <strong>QCM blanc final</strong>
+          <span>40 questions mélangées, objectif 80%</span>
+        </button>
+        <button class="quick-action" type="button" data-start-weak-qcm>
+          <strong>Mes points faibles</strong>
+          <span>Questions ciblées sur les thèmes à revoir</span>
         </button>
         <button class="quick-action" type="button" data-route="audio">
           <strong>Révision audio rapide</strong>
@@ -836,7 +1186,7 @@
       <article class="theme-card ${complete ? "is-complete" : ""}">
         <div class="theme-card-head">
           <span class="status-dot ${complete ? "done" : ""}" aria-hidden="true"></span>
-          <span>${complete ? "Terminé" : "En cours"}</span>
+          <span>${complete ? "Terminé" : masteryLevel(theme)}</span>
         </div>
         <h3>${esc(theme.title)}</h3>
         <p>${esc(theme.summary)}</p>
@@ -881,8 +1231,10 @@
         <p>Révise quand tu veux, au rythme que tu veux : 10 minutes entre deux séances, 1 heure de travail ciblé ou une longue session avec QCM complet.</p>
         <div class="hero-actions">
           <button class="btn primary large" type="button" data-continue-progress>Continuer ma progression</button>
+          <button class="btn secondary large" type="button" data-start-diagnostic>Diagnostic</button>
+          <button class="btn secondary large" type="button" data-start-weak-qcm>Points faibles</button>
           <button class="btn secondary large" type="button" data-start-errors>Revoir mes erreurs</button>
-          <button class="btn secondary large" type="button" data-start-full-qcm>Faire un QCM complet</button>
+          <button class="btn secondary large" type="button" data-start-final-qcm>QCM blanc final</button>
         </div>
       </section>
 
@@ -1103,9 +1455,17 @@
           <span>${esc(day.qcmTarget)}</span>
         </div>
         ${
+          day.day === 1
+            ? `<div class="plan-extra-actions">
+                <button class="btn primary" type="button" data-start-diagnostic>Diagnostic</button>
+                <button class="btn secondary" type="button" data-start-full-qcm>QCM général</button>
+              </div>`
+            : ""
+        }
+        ${
           day.day === 3
             ? `<div class="plan-extra-actions">
-                <button class="btn primary" type="button" data-start-full-qcm>QCM complet</button>
+                <button class="btn primary" type="button" data-start-final-qcm>QCM blanc final</button>
                 <button class="btn secondary" type="button" data-start-errors>Questions ratées</button>
                 <button class="btn ghost" type="button" data-route="review">Mises en situation</button>
               </div>`
@@ -1149,7 +1509,8 @@
           <button class="btn primary large" type="button" data-start-errors>
             Revoir mes erreurs${missedCount ? ` (${missedCount})` : ""}
           </button>
-          <button class="btn secondary large" type="button" data-start-full-qcm>Faire un QCM complet</button>
+          <button class="btn secondary large" type="button" data-start-weak-qcm>Questions points faibles</button>
+          <button class="btn secondary large" type="button" data-start-final-qcm>QCM blanc final</button>
         </div>
       </section>
       ${
@@ -1291,12 +1652,29 @@
       return quizSession;
     }
 
-    const items = shuffled(kind === "errors" ? missedQuestionItems() : allQuestionItems());
+    const items =
+      kind === "errors"
+        ? missedQuestionItems()
+        : kind === "diagnostic"
+          ? diagnosticQuestionItems()
+          : kind === "final"
+            ? finalExamQuestionItems()
+            : kind === "weak"
+              ? weakQuestionItems()
+              : shuffled(allQuestionItems());
     if (!items.length) return null;
+
+    const titleByKind = {
+      errors: "Questions ratées",
+      diagnostic: "Diagnostic initial",
+      final: "QCM blanc final",
+      weak: "Réviser mes points faibles",
+      full: "QCM complet type certification"
+    };
 
     quizSession = createQuizSession(
       kind,
-      kind === "errors" ? "Questions ratées" : "QCM complet type certification",
+      titleByKind[kind] || "QCM complet type certification",
       items
     );
     saveActiveQuiz(quizSession);
@@ -1416,16 +1794,28 @@
     const title =
       session.type === "full"
         ? "Résumé QCM complet"
+        : session.type === "diagnostic"
+          ? "Diagnostic terminé"
+          : session.type === "final"
+            ? "QCM blanc final terminé"
+            : session.type === "weak"
+              ? "Points faibles travaillés"
         : session.type === "errors"
           ? "Résumé des erreurs"
           : "Résumé QCM";
     const reviewThemes = reviewThemesFromMissed(missed);
+    const readiness =
+      percent >= 85
+        ? "Prêt certification"
+        : percent >= 80
+          ? "Presque prêt"
+          : "À revoir avant certification";
 
     return `
       <section class="quiz-panel summary">
         <span class="eyebrow">${esc(title)}</span>
         <h2>${session.score}/${total} - ${pct(percent)}</h2>
-        <p>${percent >= DATA.passScore ? "Objectif atteint. Tu peux passer à la suite." : "À revoir tranquillement : reprends la fiche puis relance le QCM."}</p>
+        <p>${session.type === "final" ? esc(readiness) : percent >= DATA.passScore ? "Objectif atteint. Tu peux passer à la suite." : "À revoir tranquillement : reprends la fiche puis relance le QCM."}</p>
         ${progressBar(percent, "Score du QCM")}
         ${
           missed.length
@@ -1486,6 +1876,22 @@
       `;
     }
 
+    if (session.type === "diagnostic") {
+      return `
+        <button class="btn primary large" type="button" data-start-weak-qcm>Réviser mes points faibles</button>
+        <button class="btn secondary large" type="button" data-route="plan">Programme 3 jours</button>
+        <button class="btn ghost large" type="button" data-route="dashboard">Tableau de bord</button>
+      `;
+    }
+
+    if (session.type === "final" || session.type === "weak") {
+      return `
+        <button class="btn primary large" type="button" data-start-final-qcm>QCM blanc final</button>
+        <button class="btn secondary large" type="button" data-start-errors>Revoir mes erreurs</button>
+        <button class="btn ghost large" type="button" data-route="dashboard">Tableau de bord</button>
+      `;
+    }
+
     return `
       <button class="btn primary large" type="button" data-start-full-qcm>Recommencer le QCM complet</button>
       <button class="btn secondary large" type="button" data-start-errors>Revoir mes erreurs</button>
@@ -1501,6 +1907,21 @@
       missed: [],
       answers: session.answers.map((answer, index) => {
         const item = session.items[index];
+        const stats = progress.questionStats[item.id] || {
+          attempts: 0,
+          correct: 0,
+          correctStreak: 0,
+          lastAnsweredAt: null
+        };
+        stats.attempts += 1;
+        stats.lastAnsweredAt = new Date().toISOString();
+        if (answer.correct) {
+          stats.correct += 1;
+          stats.correctStreak += 1;
+        } else {
+          stats.correctStreak = 0;
+        }
+        progress.questionStats[item.id] = stats;
         if (!answer.correct) {
           attemptMissed(session, item, answer);
         } else {
@@ -1524,6 +1945,12 @@
       themeState(session.themeId).qcmAttempts.push(attempt);
     } else if (session.type === "full") {
       progress.fullQuizAttempts.push(attempt);
+    } else if (session.type === "diagnostic") {
+      progress.diagnosticAttempts.push(attempt);
+    } else if (session.type === "final") {
+      progress.finalQuizAttempts.push(attempt);
+    } else if (session.type === "weak") {
+      progress.weakQuizAttempts.push(attempt);
     } else if (session.type === "errors") {
       progress.errorQuizAttempts.push(attempt);
     }
@@ -1829,6 +2256,31 @@
       return;
     }
 
+    if (target.dataset.createProfile !== undefined) {
+      createProfileFromForm();
+      return;
+    }
+
+    if (target.dataset.switchProfile) {
+      switchProfile(target.dataset.switchProfile);
+      return;
+    }
+
+    if (target.dataset.startDiagnostic !== undefined) {
+      startGlobalQuiz("diagnostic");
+      return;
+    }
+
+    if (target.dataset.startFinalQcm !== undefined) {
+      startGlobalQuiz("final");
+      return;
+    }
+
+    if (target.dataset.startWeakQcm !== undefined) {
+      startGlobalQuiz("weak");
+      return;
+    }
+
     if (target.dataset.startFullQcm !== undefined) {
       startGlobalQuiz("full");
       return;
@@ -2024,6 +2476,8 @@
 
     if (route.view === "themes") {
       renderThemes();
+    } else if (route.view === "club") {
+      renderClub();
     } else if (route.view === "dashboard") {
       renderDashboard();
     } else if (route.view === "program") {

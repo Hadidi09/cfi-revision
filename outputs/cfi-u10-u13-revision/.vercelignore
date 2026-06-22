@@ -1,0 +1,9 @@
+server*.log
+server*.pid
+server-job.id
+tunnel*.log
+tunnel*.pid
+*.err.log
+*.zip
+.DS_Store
+Thumbs.db

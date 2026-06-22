@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "outputs/cfi-u10-u13-revision/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "outputs/cfi-u10-u13-revision/index.html",
+      "headers": {
+        "X-Content-Type-Options": "nosniff"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "outputs/cfi-u10-u13-revision/$1",
+      "headers": {
+        "X-Content-Type-Options": "nosniff"
+      }
+    }
+  ]
+}

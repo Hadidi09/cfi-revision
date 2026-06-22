@@ -1,0 +1,9 @@
+work
+outputs/cfi-u10-u13-revision/server*.log
+outputs/cfi-u10-u13-revision/server*.pid
+outputs/cfi-u10-u13-revision/server-job.id
+outputs/cfi-u10-u13-revision/tunnel*.log
+outputs/cfi-u10-u13-revision/tunnel*.pid
+outputs/cfi-u10-u13-revision/*.zip
+**/.DS_Store
+**/Thumbs.db

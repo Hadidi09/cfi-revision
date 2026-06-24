@@ -29,6 +29,10 @@
       weakQuizAttempts: [],
       levelQuizAttempts: [],
       questionStats: {},
+      coachFeedback: {
+        answers: {},
+        savedAt: null
+      },
       lastRoute: null,
       activeQuiz: null,
       oralTraining: {},
@@ -148,6 +152,10 @@
       weakQuizAttempts: saved.weakQuizAttempts || [],
       levelQuizAttempts: saved.levelQuizAttempts || [],
       questionStats: saved.questionStats || {},
+      coachFeedback: {
+        answers: saved.coachFeedback?.answers || {},
+        savedAt: saved.coachFeedback?.savedAt || null
+      },
       lastRoute: saved.lastRoute || null,
       activeQuiz: saved.activeQuiz || null,
       oralTraining: saved.oralTraining || {},
@@ -266,6 +274,18 @@
 
   function pct(value) {
     return `${Math.round(value)}%`;
+  }
+
+  function formatDate(value) {
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return "date non disponible";
+    return new Intl.DateTimeFormat("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(date);
   }
 
   function list(items, className = "") {
@@ -721,6 +741,127 @@
     timeout(() => toast.classList.remove("is-visible"), 1800);
   }
 
+  async function copyText(text, successMessage = "Copié.") {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+      showToast(successMessage);
+    } catch (error) {
+      showToast("Copie impossible sur ce navigateur.");
+    }
+  }
+
+  function shareUrl() {
+    return location.href.split("#")[0] || "Application CFI U10-U13";
+  }
+
+  const COACH_FEEDBACK_QUESTIONS = [
+    {
+      id: "coherence",
+      label: "Le contenu est-il cohérent avec la certification CFI U10-U13 ?"
+    },
+    {
+      id: "qcmAdapted",
+      label: "Les QCM sont-ils adaptés ?"
+    },
+    {
+      id: "corrections",
+      label: "Les corrections sont-elles utiles ?"
+    },
+    {
+      id: "difficulty",
+      label: "Le niveau est-il trop facile, trop difficile ou équilibré ?"
+    },
+    {
+      id: "situations",
+      label: "Les mises en situation sont-elles réalistes ?"
+    },
+    {
+      id: "useful",
+      label: "L’application peut-elle aider un éducateur à se préparer ?"
+    },
+    {
+      id: "themes",
+      label: "Quels thèmes faut-il améliorer ?"
+    },
+    {
+      id: "questions",
+      label: "Quelles questions faudrait-il ajouter ?"
+    },
+    {
+      id: "missing",
+      label: "Qu’est-ce qui manque pour rendre l’application plus efficace ?"
+    }
+  ];
+
+  function savedCoachFeedback() {
+    return progress.coachFeedback?.answers || {};
+  }
+
+  function saveCoachFeedback() {
+    const answers = {};
+    document.querySelectorAll("[data-feedback-question]").forEach((field) => {
+      answers[field.dataset.feedbackQuestion] = field.value.trim();
+    });
+    progress.coachFeedback = {
+      answers,
+      savedAt: new Date().toISOString()
+    };
+    saveProgress();
+    showToast("Retour sauvegardé sur cet appareil.");
+  }
+
+  function formattedCoachFeedback() {
+    const answers = savedCoachFeedback();
+    const lines = [
+      "Retour testeur - Application révision CFI U10-U13",
+      `Lien : ${shareUrl()}`,
+      `Profil : ${activeProfile.name} (${activeProfile.club})`,
+      `Date : ${progress.coachFeedback?.savedAt ? formatDate(progress.coachFeedback.savedAt) : formatDate(new Date().toISOString())}`,
+      ""
+    ];
+
+    COACH_FEEDBACK_QUESTIONS.forEach((question) => {
+      lines.push(question.label);
+      lines.push(answers[question.id] || "Réponse à compléter");
+      lines.push("");
+    });
+
+    return lines.join("\n");
+  }
+
+  function formattedShareMessage() {
+    return [
+      "Salut,",
+      "",
+      "Je prépare une version bêta d’une application de révision pour le CFI U10-U13.",
+      "Peux-tu la tester comme un coach déjà certifié et me dire si le contenu, les QCM et les cas pratiques te semblent cohérents avec l’esprit de la formation ?",
+      "",
+      `Lien : ${shareUrl()}`,
+      "",
+      "À regarder en priorité :",
+      "- le test de niveau ;",
+      "- un QCM par thème ;",
+      "- le mode questions ratées ;",
+      "- les cas pratiques ;",
+      "- le QCM blanc final ;",
+      "- la page Retour testeur.",
+      "",
+      "Merci pour ton retour terrain."
+    ].join("\n");
+  }
+
   function updateNav() {
     const { view } = currentRoute();
     document.querySelectorAll(".main-nav button").forEach((button) => {
@@ -1077,6 +1218,7 @@
           <button class="btn secondary large" type="button" data-start-final-qcm>QCM blanc</button>
           <button class="btn secondary large" type="button" data-start-errors>Revoir mes erreurs${missedCount ? ` (${missedCount})` : ""}</button>
           <button class="btn secondary large" type="button" data-route="program">Programme CFI</button>
+          <button class="btn secondary large" type="button" data-route="feedback">Retour testeur</button>
           <button class="btn ghost large" type="button" data-reset-progress>Réinitialiser ma progression</button>
         </div>
       </section>
@@ -1149,6 +1291,110 @@
     `;
   }
 
+  function renderBetaJourney() {
+    const steps = [
+      {
+        title: "1. Accueil",
+        text: "Comprendre le but de l’application et choisir un mode.",
+        action: "Revenir à l’accueil",
+        attr: 'data-route="home"'
+      },
+      {
+        title: "2. Test de niveau",
+        text: "Faire le diagnostic pour repérer les thèmes forts et faibles.",
+        action: "Faire le diagnostic",
+        attr: "data-start-diagnostic"
+      },
+      {
+        title: "3. Thèmes faibles",
+        text: "Reprendre les contenus prioritaires et les erreurs mémorisées.",
+        action: "Voir les priorités",
+        attr: 'data-route="review"'
+      },
+      {
+        title: "4. QCM par thème",
+        text: "Travailler fiche, QCM et correction expliquée.",
+        action: "Choisir un thème",
+        attr: 'data-route="themes"'
+      },
+      {
+        title: "5. Cas pratiques",
+        text: "S’entraîner à répondre comme devant un formateur.",
+        action: "Cas pratiques",
+        attr: 'data-route="oral-training"'
+      },
+      {
+        title: "6. QCM blanc final",
+        text: "Se tester sur une session longue puis lire les conseils.",
+        action: "Lancer le QCM blanc",
+        attr: "data-start-final-qcm"
+      }
+    ];
+
+    return `
+      <section class="section-head">
+        <div>
+          <span class="eyebrow">Parcours conseillé</span>
+          <h2>Une bêta simple à tester</h2>
+        </div>
+        <button class="btn secondary" type="button" data-route="guide">Comment utiliser</button>
+      </section>
+      <section class="beta-path" aria-label="Parcours utilisateur conseillé">
+        ${steps.map((step) => `
+          <article class="beta-step">
+            <h3>${esc(step.title)}</h3>
+            <p>${esc(step.text)}</p>
+            <button class="btn ghost" type="button" ${step.attr}>${esc(step.action)}</button>
+          </article>
+        `).join("")}
+      </section>
+    `;
+  }
+
+  function renderGuide() {
+    app.innerHTML = `
+      <section class="page-title">
+        <span class="eyebrow">Comment utiliser l’application</span>
+        <h1>Réviser sans perdre le fil</h1>
+        <p>Cette application sert à préparer le CFI U10-U13 avec des fiches courtes, des QCM, des corrections, des cas pratiques, de l’audio et un suivi automatique.</p>
+        <div class="hero-actions">
+          <button class="btn primary large" type="button" data-start-diagnostic>Commencer par le test de niveau</button>
+          <button class="btn secondary large" type="button" data-route="free">Réviser en mode libre</button>
+          <button class="btn ghost large" type="button" data-route="feedback">Retour testeur</button>
+        </div>
+      </section>
+
+      ${renderBetaJourney()}
+
+      <section class="guide-grid">
+        <article class="read-panel">
+          <h2>À quoi ça sert ?</h2>
+          <p>À revoir les principes clés de la formation : sécurité, plaisir, progression, adaptation, respect, bienveillance, apprentissage par le jeu et posture éducative.</p>
+        </article>
+        <article class="read-panel">
+          <h2>Comment commencer ?</h2>
+          <p>Fais le diagnostic. L’application mémorise tes scores et propose ensuite les thèmes faibles, les questions ratées et les priorités de révision.</p>
+        </article>
+        <article class="read-panel">
+          <h2>Mode libre</h2>
+          <p>Choisis un thème, lis la fiche, écoute le résumé, fais le QCM et affiche les corrections des cas pratiques. Tu peux refaire les QCM autant de fois que nécessaire.</p>
+        </article>
+        <article class="read-panel">
+          <h2>Programme 3 jours</h2>
+          <p>Utilise-le si tu veux une révision rapide : bases et sécurité, pédagogie et climat, puis QCM blanc et bilan.</p>
+        </article>
+        <article class="read-panel">
+          <h2>Refaire ses erreurs</h2>
+          <p>Chaque mauvaise réponse est sauvegardée. Le bouton “Revoir mes erreurs” crée une session ciblée jusqu’à ce que les notions soient mieux maîtrisées.</p>
+        </article>
+        <article class="read-panel accent">
+          <h2>Savoir si tu es prêt</h2>
+          <p>Vise un QCM blanc solide, peu d’erreurs restantes, des réponses orales claires et une capacité à justifier tes choix avec les principes FFF.</p>
+        </article>
+      </section>
+    `;
+  }
+
   function renderHome() {
     const stats = globalStats();
     const nextTheme = DATA.themes.find((theme) => !isThemeCompleted(theme)) || DATA.themes[0];
@@ -1174,6 +1420,9 @@
             <button class="btn secondary large" type="button" data-route="dashboard">
               Tableau de bord
             </button>
+            <button class="btn secondary large" type="button" data-route="guide">
+              Comment utiliser
+            </button>
             <button class="btn secondary large" type="button" data-route="program">
               Programme CFI
             </button>
@@ -1182,6 +1431,9 @@
             </button>
             <button class="btn secondary large" type="button" data-route="plan">
               Mode intensif 3 jours
+            </button>
+            <button class="btn ghost large" type="button" data-route="feedback">
+              Retour testeur
             </button>
           </div>
         </div>
@@ -1192,6 +1444,8 @@
       </section>
 
       ${statCards()}
+
+      ${renderBetaJourney()}
 
       <section class="section-head">
         <div>
@@ -1252,6 +1506,10 @@
         <button class="quick-action" type="button" data-route="review">
           <strong>À revoir</strong>
           <span>Prioriser les scores faibles</span>
+        </button>
+        <button class="quick-action" type="button" data-route="feedback">
+          <strong>Retour testeur</strong>
+          <span>Partager l'application et recueillir les retours de test</span>
         </button>
       </div>
     `;
@@ -1614,6 +1872,127 @@
           ? `<section class="theme-grid">${toReview.map(themeCard).join("")}</section>`
           : `<section class="empty-state"><h2>Tout est solide</h2><p>Tous les thèmes sont terminés avec le score attendu.</p><button class="btn primary" type="button" data-route="themes">Revoir tous les thèmes</button></section>`
       }
+    `;
+  }
+
+  function renderFeedback() {
+    const answers = savedCoachFeedback();
+    const stats = globalStats();
+    const attempts = allAttemptRecords();
+    const missedCount = missedQuestionItems().length;
+    const average = averageAllAttempts();
+    const developerChecklist = [
+      "Application sans bug console",
+      "Quiz fonctionnels",
+      "Progression sauvegardée",
+      "Questions ratées sauvegardées",
+      "Mode mobile propre",
+      "Mode audio fonctionnel",
+      "Contenu complet",
+      "QCM blanc fonctionnel",
+      "Page avis coachs prête"
+    ];
+
+    app.innerHTML = `
+      <section class="page-title feedback-hero">
+        <span class="eyebrow">Retour testeur</span>
+        <h1>Version test pour éducateurs certifiés</h1>
+        <p>Cette page sert à recueillir des retours terrain avant d’envoyer l’application plus largement au club. L’objectif est de vérifier la cohérence CFI U10-U13, la difficulté des QCM et l’utilité réelle pour un éducateur.</p>
+        <div class="hero-actions">
+          <button class="btn primary large" type="button" data-copy-link>Copier le lien / Partager</button>
+          <button class="btn secondary large" type="button" data-copy-share-message>Copier le message de partage</button>
+          <button class="btn secondary large" type="button" data-save-feedback>Enregistrer les retours</button>
+          <button class="btn ghost large" type="button" data-copy-feedback>Copier les retours</button>
+        </div>
+        <div class="share-box">
+          <span>Lien de test</span>
+          <input type="text" value="${esc(shareUrl())}" readonly aria-label="Lien de partage de l'application">
+        </div>
+      </section>
+
+      <section class="share-message-panel">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Invitation bêta</span>
+            <h2>Message à envoyer aux coachs</h2>
+          </div>
+          <button class="btn secondary" type="button" data-copy-share-message>Copier</button>
+        </div>
+        <pre>${esc(formattedShareMessage())}</pre>
+      </section>
+
+      <section class="stats-grid" aria-label="État de la version test">
+        <article class="stat-card">
+          <span class="stat-label">Thèmes</span>
+          <strong>${DATA.themes.length}</strong>
+          <small>Fiches, QCM, situations et audio</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Questions</span>
+          <strong>${allQuestionItems().length}</strong>
+          <small>Dont diagnostic, points faibles et QCM blanc</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Progression test</span>
+          <strong>${pct(stats.globalProgress)}</strong>
+          ${progressBar(stats.globalProgress)}
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">QCM réalisés</span>
+          <strong>${attempts.length}</strong>
+          <small>${average === null ? "Aucun score enregistré" : `Score moyen ${pct(average)}`}</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Erreurs mémorisées</span>
+          <strong>${missedCount}</strong>
+          <small>Disponibles dans “Revoir mes erreurs”</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Dernier retour</span>
+          <strong>${progress.coachFeedback?.savedAt ? "Sauvé" : "À remplir"}</strong>
+          <small>${progress.coachFeedback?.savedAt ? formatDate(progress.coachFeedback.savedAt) : "Retours non enregistrés"}</small>
+        </article>
+      </section>
+
+      <section class="feedback-layout">
+        <article class="read-panel accent">
+          <h2>Objectifs du test</h2>
+          ${list([
+            "Valider que le contenu reste fidèle à l’esprit FFF : sécurité, plaisir, respect, bienveillance et progression.",
+            "Repérer les QCM trop simples, ambigus ou pas assez proches des situations de terrain.",
+            "Vérifier que l’application se prend en main rapidement sur téléphone.",
+            "Identifier les thèmes à renforcer avant une diffusion club."
+          ], "check-list")}
+        </article>
+
+        <article class="read-panel">
+          <h2>Checklist développeur</h2>
+          ${list(developerChecklist, "check-list developer-checklist")}
+        </article>
+      </section>
+
+      <section class="coach-feedback-form" aria-label="Questions pour les coachs testeurs">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Retour terrain</span>
+            <h2>Questionnaire retour testeur</h2>
+          </div>
+          <button class="btn secondary" type="button" data-save-feedback>Enregistrer</button>
+        </div>
+        <div class="feedback-questions">
+          ${COACH_FEEDBACK_QUESTIONS.map((question, index) => `
+            <label class="feedback-question">
+              <span>${index + 1}. ${esc(question.label)}</span>
+              <textarea data-feedback-question="${esc(question.id)}" rows="4" placeholder="Réponse du coach testeur...">${esc(answers[question.id] || "")}</textarea>
+            </label>
+          `).join("")}
+        </div>
+        <div class="hero-actions feedback-actions">
+          <button class="btn primary large" type="button" data-save-feedback>Enregistrer les retours</button>
+          <button class="btn secondary large" type="button" data-copy-feedback>Copier le compte-rendu</button>
+          <button class="btn ghost large" type="button" data-route="dashboard">Retour tableau de bord</button>
+        </div>
+      </section>
     `;
   }
 
@@ -2076,26 +2455,7 @@
       missed: [],
       answers: session.answers.map((answer, index) => {
         const item = session.items[index];
-        const stats = progress.questionStats[item.id] || {
-          attempts: 0,
-          correct: 0,
-          correctStreak: 0,
-          lastAnsweredAt: null
-        };
-        stats.attempts += 1;
-        stats.lastAnsweredAt = new Date().toISOString();
-        if (answer.correct) {
-          stats.correct += 1;
-          stats.correctStreak += 1;
-        } else {
-          stats.correctStreak = 0;
-        }
-        progress.questionStats[item.id] = stats;
-        if (!answer.correct) {
-          attemptMissed(session, item, answer);
-        } else {
-          delete progress.missedQuestions[item.id];
-        }
+        recordQuestionAnswer(session, item, answer);
         return {
           id: item.id,
           themeId: item.themeId,
@@ -2127,6 +2487,29 @@
     }
 
     saveProgress();
+  }
+
+  function recordQuestionAnswer(session, item, answer) {
+    if (answer.recorded) return;
+
+    const stats = progress.questionStats[item.id] || {
+      attempts: 0,
+      correct: 0,
+      correctStreak: 0,
+      lastAnsweredAt: null
+    };
+    stats.attempts += 1;
+    stats.lastAnsweredAt = new Date().toISOString();
+    if (answer.correct) {
+      stats.correct += 1;
+      stats.correctStreak += 1;
+      delete progress.missedQuestions[item.id];
+    } else {
+      stats.correctStreak = 0;
+      attemptMissed(session, item, answer);
+    }
+    progress.questionStats[item.id] = stats;
+    answer.recorded = true;
   }
 
   function attemptMissed(session, item, answer) {
@@ -2472,6 +2855,28 @@
       return;
     }
 
+    if (target.dataset.copyLink !== undefined) {
+      copyText(shareUrl(), "Lien copié.");
+      return;
+    }
+
+    if (target.dataset.copyShareMessage !== undefined) {
+      copyText(formattedShareMessage(), "Message de partage copié.");
+      return;
+    }
+
+    if (target.dataset.saveFeedback !== undefined) {
+      saveCoachFeedback();
+      render();
+      return;
+    }
+
+    if (target.dataset.copyFeedback !== undefined) {
+      saveCoachFeedback();
+      copyText(formattedCoachFeedback(), "Compte-rendu copié.");
+      return;
+    }
+
     if (target.dataset.openTheme) {
       setRoute("theme", target.dataset.openTheme, "fiche");
       return;
@@ -2542,10 +2947,12 @@
       const correct = isMultiple
         ? sameIndexes(selectedIndexes, question.answerIndexes)
         : selectedIndexes[0] === question.answerIndex;
-      session.answers[session.index] = isMultiple
+      const answerRecord = isMultiple
         ? { selectedIndexes, correct }
         : { selectedIndex: selectedIndexes[0], selectedIndexes, correct };
+      session.answers[session.index] = answerRecord;
       if (correct) session.score += 1;
+      recordQuestionAnswer(session, session.items[session.index], answerRecord);
       saveActiveQuiz(session);
       render();
       return;
@@ -2657,6 +3064,8 @@
 
     if (route.view === "themes") {
       renderThemes();
+    } else if (route.view === "guide") {
+      renderGuide();
     } else if (route.view === "club") {
       renderClub();
     } else if (route.view === "dashboard") {
@@ -2673,6 +3082,8 @@
       renderOralTraining();
     } else if (route.view === "review") {
       renderReview();
+    } else if (route.view === "feedback") {
+      renderFeedback();
     } else if (route.view === "quiz") {
       app.innerHTML = renderGlobalQuiz(route.themeId || "full");
     } else if (route.view === "theme") {

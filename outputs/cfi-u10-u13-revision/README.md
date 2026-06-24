@@ -1,15 +1,41 @@
 # Révision CFI U10-U13
 
-Application web statique pour réviser la certification CFI U10-U13 sur ordinateur ou téléphone.
+Application web statique pour aider des éducateurs à préparer la certification CFI U10-U13. Elle est pensée pour une révision simple sur ordinateur ou téléphone, avec fiches courtes, QCM, cas pratiques, audio, progression locale et retours testeurs.
 
-## Lancer le projet
+## Objectif bêta
+
+Cette version bêta doit pouvoir être partagée à plusieurs coachs ayant déjà validé le CFI U10-U13 afin de vérifier :
+
+- la cohérence du contenu avec l’esprit de la formation ;
+- le niveau des QCM ;
+- l’utilité des corrections ;
+- le réalisme des mises en situation ;
+- la facilité d’utilisation sur mobile ;
+- les améliorations à prévoir avant diffusion plus large.
+
+## Fonctionnalités
+
+- Parcours conseillé : accueil, test de niveau, thèmes faibles, QCM par thème, cas pratiques, QCM blanc final, résultat avec conseils.
+- Mode libre : choix d’un thème, fiche, QCM, audio et situations.
+- Mode intensif 3 jours : planning rapide de révision.
+- Diagnostic initial : test court pour repérer les priorités.
+- QCM par thème, QCM complet, QCM blanc final et questions par difficulté.
+- Questions ratées sauvegardées automatiquement.
+- Tableau de bord : progression, scores, thèmes forts/faibles, dernière session.
+- Mode audio avec synthèse vocale du navigateur.
+- Espace club avec profils locaux séparés.
+- Mode sombre.
+- Page `Comment utiliser l’application`.
+- Page `Retour testeur` avec questionnaire, lien et message de partage copiable.
+
+## Lancer en local
 
 Option simple :
 
 1. Ouvrir `index.html` dans un navigateur moderne.
-2. La progression est sauvegardée automatiquement dans le `localStorage` du navigateur.
+2. La progression est sauvegardée automatiquement dans le `localStorage`.
 
-Option avec serveur local :
+Option serveur local :
 
 ```bash
 cd outputs/cfi-u10-u13-revision
@@ -18,152 +44,137 @@ python -m http.server 8000
 
 Puis ouvrir `http://localhost:8000`.
 
-## Déployer sur Vercel
+## Build
 
-Depuis ce dossier :
+Le projet est une application statique en HTML, CSS et JavaScript vanilla.
+
+Aucun build n’est nécessaire. Les fichiers à publier sont :
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `data.js`
+- `vercel.json`
+
+L’archive `cfi-u10-u13-revision-vercel.zip` contient la version prête à partager/déployer.
+
+## Déploiement
+
+### Vercel
+
+Depuis le dossier `outputs/cfi-u10-u13-revision` :
 
 ```bash
 npx vercel
 npx vercel --prod
 ```
 
-Le projet est une application statique : aucun build n'est nécessaire. Les fichiers temporaires de serveur local et de tunnel sont exclus par `.vercelignore`.
+Le fichier `vercel.json` redirige toutes les routes vers `index.html`, ce qui permet d’utiliser les URLs avec `#home`, `#guide`, `#feedback`, etc.
+
+### Netlify
+
+Déposer le dossier `outputs/cfi-u10-u13-revision` dans Netlify Drop ou créer un site à partir de ce dossier.
+
+Paramètres :
+
+- build command : laisser vide ;
+- publish directory : `outputs/cfi-u10-u13-revision` si le dépôt racine est utilisé, ou `.` si le dossier est déployé directement.
 
 ## Structure
 
-- `index.html` : structure HTML de l'application.
-- `styles.css` : interface responsive.
-- `app.js` : navigation, tableau de bord, QCM, synthèse vocale, situations, mode sombre, reprise et progression.
-- `data.js` : contenus de révision, questions, corrections, résumés audio et planning 3 jours.
-- `vercel.json` : configuration de déploiement statique Vercel.
+- `index.html` : structure de base, navigation, chargement des scripts.
+- `styles.css` : design responsive, mode sombre, mobile.
+- `app.js` : navigation, QCM, progression, audio, retours testeurs.
+- `data.js` : thèmes, fiches, QCM, corrections, cas pratiques, scripts audio.
+- `vercel.json` : configuration de déploiement statique.
+- `.vercelignore` : exclusions de fichiers locaux.
 
-## Modes disponibles
+## Modifier les contenus
 
-- Espace club :
-  plusieurs éducateurs peuvent utiliser la même application avec des profils séparés. Chaque profil conserve sa progression, ses scores, ses erreurs et ses QCM.
-- Diagnostic initial :
-  test court et mélangé pour identifier rapidement les thèmes forts et les thèmes faibles avant de lancer la révision.
-- Programme CFI :
-  la page reprend les modules et fichiers du parcours fourni, puis les relie aux thèmes, fiches, QCM, audios et mises en situation de l'application.
-- Révision intensive 3 jours :
-  Jour 1 travaille la séance, la posture éducateur et la sécurité.
-  Jour 2 travaille la pédagogie, le développement de l'enfant et le climat d'entraînement.
-  Jour 3 sert à faire le QCM complet, reprendre les mises en situation, revoir violence/discrimination et faire le bilan.
-- Révision libre :
-  l'utilisateur choisit ses thèmes, refait les QCM, écoute les fiches, révise 10 minutes ou plusieurs heures, et reprend automatiquement sa progression.
-- Révision des points faibles :
-  l'application génère une session ciblée à partir des thèmes non maîtrisés et des scores insuffisants.
-- Quiz par difficulté :
-  l'utilisateur peut réviser en mode facile, moyen, difficile ou certification. Les réponses sont mélangées et la correction n'apparaît qu'après validation.
-- QCM blanc final :
-  session de 40 questions mélangées avec indication de préparation : prêt, presque prêt ou à revoir avant certification.
-- Révision audio rapide :
-  l'utilisateur peut écouter un thème ou enchaîner tous les résumés audio, choisir une voix française si disponible, régler la vitesse, régler la tonalité, mettre en pause et reprendre.
-- Entraînement oral :
-  l'utilisateur répond librement à des cas terrain, puis affiche une réponse-type attendue dans l'esprit FFF.
+Tout le contenu pédagogique est dans `data.js`.
 
-## Tableau de bord
-
-Le tableau de bord affiche :
-
-- progression globale ;
-- nombre de QCM réalisés ;
-- score moyen ;
-- meilleurs thèmes ;
-- thèmes à revoir ;
-- dernière session ;
-- diagnostic initial ;
-- QCM blanc final ;
-- questions maîtrisées ;
-- temps de révision conseillé ;
-- bouton pour continuer ;
-- bouton pour réviser les points faibles ;
-- bouton pour faire un QCM blanc ;
-- bouton pour réinitialiser la progression locale.
-
-## Boutons principaux
-
-- `Réviser librement` : ouvre le mode libre.
-- `Continuer ma progression` : reprend le dernier écran utile ou propose le prochain thème.
-- `Diagnostic` : lance un test court pour situer le niveau du profil actif.
-- `Points faibles` : lance un QCM ciblé sur les thèmes à revoir.
-- `Mode facile`, `Mode moyen`, `Mode difficile` : lance des questions filtrées par niveau.
-- `Quiz certification` : lance un quiz majoritairement composé de questions moyennes et difficiles.
-- `Revoir mes erreurs` : lance un QCM uniquement sur les questions ratées mémorisées.
-- `Faire un QCM complet` : lance toutes les questions disponibles.
-- `QCM blanc final` : lance une session certification avec objectif 80 % minimum.
-- `Sombre` / `Clair` : bascule l'interface en mode sombre ou clair. Le choix est sauvegardé dans le navigateur.
-- `Réinitialiser ma progression` : efface les données locales après confirmation.
-
-## Contenu inclus
-
-Chaque thème contient maintenant :
-
-- une fiche courte ;
-- au moins 5 points essentiels ;
-- au moins 5 erreurs à éviter ;
-- 10 questions QCM avec corrections expliquées ;
-- 3 mises en situation ;
-- un résumé audio naturel.
-
-Le système de QCM utilise maintenant :
-
-- sélection de réponse puis bouton `Valider ma réponse` ;
-- blocage du choix après validation ;
-- mélange des questions et des réponses ;
-- niveaux `easy`, `medium`, `hard` ;
-- corrections détaillées : meilleure réponse, pourquoi les autres options sont moins adaptées, principe FFF, mots-clés ;
-- ajout automatique des erreurs dans les questions à revoir ;
-- suivi des questions maîtrisées après plusieurs réussites.
-
-Un thème dédié `La connaissance du jeu` a été ajouté à partir du module CFI/FOAD :
-
-- système entraînement : entraîneur, jeu, joueur ;
-- définition du football ;
-- logique interne du football ;
-- incertitudes événementielle, temporelle et spatiale ;
-- communication entre partenaires ;
-- crises de nombre, de temps et d'espace ;
-- espace de jeu effectif ;
-- espaces de conservation, progression, déséquilibre et finition.
-- rapport d'opposition et détermination des niveaux de jeu ;
-- 3 moments du jeu : possession, non-possession, changement de possession ;
-- 5 phases de jeu : conservation-progression, déséquilibre-finition, opposition à la progression, protection du but, transition ;
-- 4 niveaux : débutant, initié, confirmé, expert ;
-- observations et objectifs d'apprentissage associés à chaque niveau.
-
-## Ajouter ou modifier du contenu
-
-Tout le contenu est dans `data.js`.
-
-Les correspondances du programme CFI sont dans `officialProgram`. Pour rattacher un module à un thème, ajoute simplement l'identifiant du thème dans `themeIds`.
-
-Pour ajouter une question, ajoute un objet dans le tableau `quiz` d'un thème :
+Pour ajouter une question dans un thème :
 
 ```js
 {
-  question: "Ta question ?",
-  options: ["Bonne réponse", "Réponse 2", "Réponse 3"],
+  question: "Question posée à l’éducateur ?",
+  options: [
+    "Meilleure réponse",
+    "Réponse proche mais moins adaptée",
+    "Réponse incomplète",
+    "Réponse à éviter"
+  ],
   answerIndex: 0,
-  explanation: "Explication courte affichée après la réponse."
+  explanation: "Correction courte.",
+  difficulty: "medium",
+  whyCorrect: "Pourquoi cette réponse est la plus adaptée.",
+  whyOthers: "Pourquoi les autres options sont moins bonnes.",
+  principle: "Principe FFF associé.",
+  keywords: ["sécurité", "adaptation", "bienveillance"]
 }
 ```
 
-Pour ajouter une mise en situation, ajoute un objet dans `situations` :
+Pour ajouter une mise en situation :
 
 ```js
 {
   id: "identifiant-unique",
   title: "Titre court",
   prompt: "Situation terrain...",
-  correction: ["Point attendu 1", "Point attendu 2"],
-  explanation: "Pourquoi cette correction est pertinente."
+  correction: [
+    "Action attendue 1",
+    "Action attendue 2",
+    "Action attendue 3"
+  ],
+  explanation: "Pourquoi cette réponse est pertinente."
 }
 ```
 
-## Notes de contenu
+Pour ajouter un thème, copier la structure d’un thème existant : `id`, `title`, `summary`, `sheet`, `essentials`, `mistakes`, `oralScript`, `quiz`, `situations`.
 
-Le contenu reste volontairement centré sur des principes généraux de formation :
+## Message de partage
+
+Message court à envoyer aux coachs testeurs :
+
+```text
+Salut,
+
+Je prépare une version bêta d’une application de révision pour le CFI U10-U13.
+Peux-tu la tester comme un coach déjà certifié et me dire si le contenu, les QCM et les cas pratiques te semblent cohérents avec l’esprit de la formation ?
+
+Lien : [ajouter le lien de l’application]
+
+À regarder en priorité :
+- le test de niveau ;
+- un QCM par thème ;
+- le mode questions ratées ;
+- les cas pratiques ;
+- le QCM blanc final ;
+- la page Retour testeur.
+
+Merci pour ton retour terrain.
+```
+
+Le même message est disponible dans l’application sur la page `Retour testeur`.
+
+## Checklist bêta avant partage
+
+- Application testée sur mobile.
+- Application testée sur ordinateur.
+- Quiz fonctionnels.
+- Validation des réponses fonctionnelle.
+- Bouton question suivante fonctionnel.
+- Scores fonctionnels.
+- Questions ratées sauvegardées.
+- Mode audio fonctionnel.
+- QCM blanc fonctionnel.
+- Contenus relus.
+- Page retour testeur disponible.
+- README complet.
+
+## Notes pédagogiques
+
+Le contenu reste volontairement centré sur des principes généraux compatibles avec l’esprit FFF :
 
 - sécurité ;
 - plaisir ;
@@ -175,4 +186,4 @@ Le contenu reste volontairement centré sur des principes généraux de formatio
 - posture éducative positive ;
 - lutte contre la violence et les discriminations.
 
-Les règles précises de compétition, plateau, challenge ou critérium peuvent varier selon les districts et les saisons. Vérifie toujours les documents transmis par ton club ou ton instance locale.
+Les règles précises de compétition, challenge ou critérium peuvent varier selon les districts et les saisons. Vérifier les documents transmis par le club ou l’instance locale avant d’ajouter une règle très spécifique.

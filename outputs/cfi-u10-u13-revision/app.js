@@ -27,6 +27,7 @@
       diagnosticAttempts: [],
       finalQuizAttempts: [],
       weakQuizAttempts: [],
+      levelQuizAttempts: [],
       questionStats: {},
       lastRoute: null,
       activeQuiz: null,
@@ -145,6 +146,7 @@
       diagnosticAttempts: saved.diagnosticAttempts || [],
       finalQuizAttempts: saved.finalQuizAttempts || [],
       weakQuizAttempts: saved.weakQuizAttempts || [],
+      levelQuizAttempts: saved.levelQuizAttempts || [],
       questionStats: saved.questionStats || {},
       lastRoute: saved.lastRoute || null,
       activeQuiz: saved.activeQuiz || null,
@@ -361,13 +363,27 @@
       type: "weak",
       label: "Points faibles"
     }));
+    const levelAttempts = (progress.levelQuizAttempts || []).map((attempt) => ({
+      ...attempt,
+      type: attempt.mode || "level",
+      label:
+        attempt.mode === "certification"
+          ? "Quiz certification"
+          : attempt.mode === "easy"
+            ? "Quiz facile"
+            : attempt.mode === "medium"
+              ? "Quiz moyen"
+              : attempt.mode === "hard"
+                ? "Quiz difficile"
+                : "Quiz par niveau"
+    }));
     const errorAttempts = (progress.errorQuizAttempts || []).map((attempt) => ({
       ...attempt,
       type: "errors",
       label: "Questions ratées"
     }));
 
-    return [...themeAttempts, ...fullAttempts, ...diagnosticAttempts, ...finalAttempts, ...weakAttempts, ...errorAttempts].sort(
+    return [...themeAttempts, ...fullAttempts, ...diagnosticAttempts, ...finalAttempts, ...weakAttempts, ...levelAttempts, ...errorAttempts].sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
   }
@@ -443,7 +459,71 @@
     return "Avance par blocs courts : fiche, QCM, correction, puis une situation terrain.";
   }
 
+  function questionDifficulty(question, questionIndex = 0) {
+    if (question.difficulty) return question.difficulty;
+    if (/situation|parent|moquer|discrimin|refuse|dispute|critique|monopolise|difficult/i.test(question.question)) {
+      return "hard";
+    }
+    return questionIndex % 3 === 0 ? "easy" : questionIndex % 3 === 1 ? "medium" : "hard";
+  }
+
+  function withShuffledOptions(question) {
+    const options = question.options.map((text, originalIndex) => ({ text, originalIndex }));
+    const mixed = shuffled(options);
+    const correctOriginalIndexes = Array.isArray(question.answerIndexes)
+      ? question.answerIndexes
+      : [question.answerIndex];
+    const nextQuestion = {
+      ...question,
+      options: mixed.map((item) => item.text),
+      difficulty: questionDifficulty(question)
+    };
+    const nextAnswerIndexes = mixed
+      .map((item, index) => (correctOriginalIndexes.includes(item.originalIndex) ? index : null))
+      .filter((index) => index !== null);
+
+    if (Array.isArray(question.answerIndexes)) {
+      nextQuestion.answerIndexes = nextAnswerIndexes.sort((a, b) => a - b);
+      delete nextQuestion.answerIndex;
+    } else {
+      nextQuestion.answerIndex = nextAnswerIndexes[0];
+      delete nextQuestion.answerIndexes;
+    }
+
+    return nextQuestion;
+  }
+
+  function createQuestionItem(theme, question, questionIndex) {
+    return {
+      id: `${theme.id}:${questionIndex}`,
+      themeId: theme.id,
+      themeTitle: theme.title,
+      questionIndex,
+      question: withShuffledOptions({ ...question, difficulty: questionDifficulty(question, questionIndex) })
+    };
+  }
+
   function allQuestionItems() {
+    return DATA.themes.flatMap((theme) =>
+      theme.quiz.map((question, questionIndex) => createQuestionItem(theme, question, questionIndex))
+    );
+  }
+
+  function questionItemsForTheme(theme) {
+    return theme.quiz.map((question, questionIndex) => createQuestionItem(theme, question, questionIndex));
+  }
+
+  function filterByDifficulty(items, mode) {
+    if (mode === "easy") return items.filter((item) => item.question.difficulty === "easy");
+    if (mode === "medium") return items.filter((item) => item.question.difficulty === "medium");
+    if (mode === "hard") return items.filter((item) => item.question.difficulty === "hard");
+    if (mode === "certification") {
+      return items.filter((item) => item.question.difficulty !== "easy");
+    }
+    return items;
+  }
+
+  function allQuestionItemsLegacyShape() {
     return DATA.themes.flatMap((theme) =>
       theme.quiz.map((question, questionIndex) => ({
         id: `${theme.id}:${questionIndex}`,
@@ -473,15 +553,7 @@
     const picked = [];
     const used = new Set();
     for (const theme of DATA.themes) {
-      const item = shuffled(
-        theme.quiz.map((question, questionIndex) => ({
-          id: `${theme.id}:${questionIndex}`,
-          themeId: theme.id,
-          themeTitle: theme.title,
-          questionIndex,
-          question
-        }))
-      )[0];
+      const item = shuffled(questionItemsForTheme(theme))[0];
       if (item && !used.has(item.id)) {
         picked.push(item);
         used.add(item.id);
@@ -523,7 +595,8 @@
       score: session.score,
       answers: session.answers,
       draftSelections: session.draftSelections || {},
-      itemIds: session.items.map((item) => item.id)
+      itemIds: session.items.map((item) => item.id),
+      items: session.items
     };
     saveProgress();
   }
@@ -538,7 +611,9 @@
     if (!saved || saved.type !== type) return null;
     if (type === "theme" && saved.themeId !== themeId) return null;
 
-    const items = (saved.itemIds || []).map(questionItemById).filter(Boolean);
+    const items = Array.isArray(saved.items) && saved.items.length
+      ? saved.items
+      : (saved.itemIds || []).map(questionItemById).filter(Boolean);
     if (!items.length) return null;
 
     return {
@@ -591,9 +666,10 @@
   }
 
   function rememberRoute(route) {
+    const resumableQuizzes = ["full", "errors", "diagnostic", "final", "weak", "certification", "easy", "medium", "hard"];
     const canResume =
       route.view === "theme" ||
-      (route.view === "quiz" && (route.themeId === "full" || route.themeId === "errors"));
+      (route.view === "quiz" && resumableQuizzes.includes(route.themeId));
     if (!canResume) return;
 
     progress.lastRoute = {
@@ -1153,6 +1229,10 @@
           <strong>QCM blanc final</strong>
           <span>40 questions mélangées, objectif 80%</span>
         </button>
+        <button class="quick-action" type="button" data-start-level="certification">
+          <strong>Quiz certification</strong>
+          <span>Majorité de questions moyennes et difficiles</span>
+        </button>
         <button class="quick-action" type="button" data-start-weak-qcm>
           <strong>Mes points faibles</strong>
           <span>Questions ciblées sur les thèmes à revoir</span>
@@ -1250,6 +1330,22 @@
         <button class="free-card" type="button" data-start-full-qcm>
           <strong>Session 2h ou plus</strong>
           <span>Faire le QCM complet, traiter les erreurs et finir par l'oral.</span>
+        </button>
+        <button class="free-card" type="button" data-start-level="easy">
+          <strong>Mode facile</strong>
+          <span>Réviser les bases et remettre les repères en place.</span>
+        </button>
+        <button class="free-card" type="button" data-start-level="medium">
+          <strong>Mode moyen</strong>
+          <span>Questions de réflexion avec réponses proches.</span>
+        </button>
+        <button class="free-card" type="button" data-start-level="hard">
+          <strong>Mode difficile</strong>
+          <span>Cas terrain et choix vraiment éducatifs.</span>
+        </button>
+        <button class="free-card" type="button" data-start-level="certification">
+          <strong>Quiz certification</strong>
+          <span>30 à 40 questions, surtout niveau moyen et difficile.</span>
         </button>
         <button class="free-card" type="button" data-open-theme-mode="${esc(nextTheme.id)}" data-mode="oral">
           <strong>Écouter les fiches</strong>
@@ -1630,13 +1726,7 @@
         return quizSession;
       }
 
-      const items = shuffled(theme.quiz.map((question, questionIndex) => ({
-        id: `${theme.id}:${questionIndex}`,
-        themeId: theme.id,
-        themeTitle: theme.title,
-        questionIndex,
-        question
-      })));
+      const items = shuffled(questionItemsForTheme(theme));
       quizSession = createQuizSession("theme", `QCM - ${theme.title}`, items, theme.id);
       saveActiveQuiz(quizSession);
     }
@@ -1661,6 +1751,10 @@
             ? finalExamQuestionItems()
             : kind === "weak"
               ? weakQuestionItems()
+              : kind === "certification"
+                ? shuffled(filterByDifficulty(allQuestionItems(), "certification")).slice(0, 40)
+                : ["easy", "medium", "hard"].includes(kind)
+                  ? shuffled(filterByDifficulty(allQuestionItems(), kind)).slice(0, 30)
               : shuffled(allQuestionItems());
     if (!items.length) return null;
 
@@ -1669,6 +1763,10 @@
       diagnostic: "Diagnostic initial",
       final: "QCM blanc final",
       weak: "Réviser mes points faibles",
+      certification: "Quiz certification",
+      easy: "Quiz facile - bases",
+      medium: "Quiz moyen - réflexion",
+      hard: "Quiz difficile - cas terrain",
       full: "QCM complet type certification"
     };
 
@@ -1703,6 +1801,43 @@
     return renderQuizSession(session);
   }
 
+  function difficultyLabel(difficulty) {
+    if (difficulty === "easy") return "Facile";
+    if (difficulty === "medium") return "Moyen";
+    if (difficulty === "hard") return "Difficile";
+    return "Certification";
+  }
+
+  function renderCorrectionDetails(question, correctIndexes) {
+    const correctOptions = correctIndexes.map((index) => question.options[index]).filter(Boolean);
+    const keywords = question.keywords || ["sécurité", "adaptation", "bienveillance", "progression"];
+    const principle =
+      question.principle ||
+      "Dans l'esprit FFF, la meilleure réponse protège le joueur, maintient l'activité, adapte la difficulté et installe un climat positif.";
+    const whyOthers =
+      question.whyOthers ||
+      question.options
+        .map((option, index) =>
+          correctIndexes.includes(index)
+            ? null
+            : `${option} : réponse moins adaptée car elle oublie au moins un repère essentiel : sécurité, adaptation, respect ou progression.`
+        )
+        .filter(Boolean);
+
+    return `
+      <div class="correction-details">
+        <p><strong>Meilleure réponse :</strong> ${esc(correctOptions.join(" / "))}</p>
+        <p><strong>Pourquoi :</strong> ${esc(question.whyCorrect || question.explanation)}</p>
+        <p><strong>Principe FFF :</strong> ${esc(principle)}</p>
+        <div>
+          <strong>Pourquoi les autres réponses sont moins adaptées</strong>
+          ${list(whyOthers, "avoid-list")}
+        </div>
+        <p><strong>Mots-clés :</strong> ${esc(keywords.join(", "))}</p>
+      </div>
+    `;
+  }
+
   function renderQuizSession(session) {
     if (session.finished) {
       return renderQuizSummary(session);
@@ -1726,7 +1861,7 @@
           <strong>Score ${session.score}</strong>
         </div>
         ${progressBar((session.index / total) * 100, "Avancement du QCM")}
-        <span class="question-theme">${esc(item.themeTitle)}</span>
+        <span class="question-theme">${esc(item.themeTitle)} · ${difficultyLabel(question.difficulty)}</span>
         <h2>${esc(question.question)}</h2>
         <div class="answers">
           ${question.options
@@ -1753,15 +1888,14 @@
             ? `<div class="feedback ${answer.correct ? "good" : "bad"}">
                 <strong>${answer.correct ? "Bonne réponse" : "Réponse à corriger"}</strong>
                 <p>${esc(question.explanation)}</p>
+                ${renderCorrectionDetails(question, correctIndexes)}
               </div>
               <button class="btn primary large" type="button" data-next-question>
                 ${session.index === total - 1 ? "Voir le résumé" : "Question suivante"}
               </button>`
-            : isMultiple
-              ? `<button class="btn primary large" type="button" data-validate-multi ${selectedIndexes.length ? "" : "disabled"}>
-                  Valider mes réponses
-                </button>`
-            : ""
+            : `<button class="btn primary large" type="button" data-validate-answer ${selectedIndexes.length ? "" : "disabled"}>
+                ${isMultiple ? "Valider mes réponses" : "Valider ma réponse"}
+              </button>`
         }
       </section>
     `;
@@ -1785,6 +1919,23 @@
     return [...grouped.values()].sort((a, b) => b.count - a.count);
   }
 
+  function themeResultsFromSession(session) {
+    const grouped = new Map();
+    session.items.forEach((item, index) => {
+      const answer = session.answers[index];
+      const current = grouped.get(item.themeId) || {
+        themeId: item.themeId,
+        title: item.themeTitle,
+        total: 0,
+        score: 0
+      };
+      current.total += 1;
+      if (answer?.correct) current.score += 1;
+      grouped.set(item.themeId, current);
+    });
+    return [...grouped.values()].sort((a, b) => a.score / a.total - b.score / b.total);
+  }
+
   function renderQuizSummary(session) {
     const total = session.items.length;
     const percent = (session.score / total) * 100;
@@ -1804,6 +1955,7 @@
           ? "Résumé des erreurs"
           : "Résumé QCM";
     const reviewThemes = reviewThemesFromMissed(missed);
+    const themeResults = themeResultsFromSession(session);
     const readiness =
       percent >= 85
         ? "Prêt certification"
@@ -1834,6 +1986,23 @@
                   .join("")}
               </div>`
             : `<div class="feedback good"><strong>Sans faute</strong><p>Tu as répondu correctement à toutes les questions de cette session.</p></div>`
+        }
+        ${
+          ["full", "final", "diagnostic", "weak", "certification", "easy", "medium", "hard"].includes(session.type)
+            ? `<div class="review-themes">
+                <h3>Résultat par thème</h3>
+                ${themeResults
+                  .map(
+                    (item) => `
+                      <button type="button" data-open-theme="${esc(item.themeId)}">
+                        <span>${esc(item.title)}</span>
+                        <small>${item.score}/${item.total} · ${pct((item.score / item.total) * 100)}</small>
+                      </button>
+                    `
+                  )
+                  .join("")}
+              </div>`
+            : ""
         }
         ${
           reviewThemes.length
@@ -1951,6 +2120,8 @@
       progress.finalQuizAttempts.push(attempt);
     } else if (session.type === "weak") {
       progress.weakQuizAttempts.push(attempt);
+    } else if (["easy", "medium", "hard", "certification"].includes(session.type)) {
+      progress.levelQuizAttempts.push({ ...attempt, mode: session.type });
     } else if (session.type === "errors") {
       progress.errorQuizAttempts.push(attempt);
     }
@@ -2281,6 +2452,11 @@
       return;
     }
 
+    if (target.dataset.startLevel) {
+      startGlobalQuiz(target.dataset.startLevel);
+      return;
+    }
+
     if (target.dataset.startFullQcm !== undefined) {
       startGlobalQuiz("full");
       return;
@@ -2335,6 +2511,8 @@
       if (!session) return;
       const index = Number(target.dataset.answer);
       const question = session.items[session.index].question;
+      if (session.answers[session.index]) return;
+      session.draftSelections ||= {};
       if (Array.isArray(question.answerIndexes)) {
         const current = new Set(session.draftSelections?.[session.index] || []);
         if (current.has(index)) {
@@ -2348,22 +2526,25 @@
         render();
         return;
       }
-      const correct = index === question.answerIndex;
-      session.answers[session.index] = { selectedIndex: index, correct };
-      if (correct) session.score += 1;
+      session.draftSelections[session.index] = [index];
       saveActiveQuiz(session);
       render();
       return;
     }
 
-    if (target.dataset.validateMulti !== undefined) {
+    if (target.dataset.validateAnswer !== undefined || target.dataset.validateMulti !== undefined) {
       const session = quizSession;
       if (!session) return;
       const question = session.items[session.index].question;
       const selectedIndexes = session.draftSelections?.[session.index] || [];
-      if (!Array.isArray(question.answerIndexes) || !selectedIndexes.length) return;
-      const correct = sameIndexes(selectedIndexes, question.answerIndexes);
-      session.answers[session.index] = { selectedIndexes, correct };
+      if (!selectedIndexes.length || session.answers[session.index]) return;
+      const isMultiple = Array.isArray(question.answerIndexes);
+      const correct = isMultiple
+        ? sameIndexes(selectedIndexes, question.answerIndexes)
+        : selectedIndexes[0] === question.answerIndex;
+      session.answers[session.index] = isMultiple
+        ? { selectedIndexes, correct }
+        : { selectedIndex: selectedIndexes[0], selectedIndexes, correct };
       if (correct) session.score += 1;
       saveActiveQuiz(session);
       render();

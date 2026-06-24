@@ -53,6 +53,8 @@ Le projet est une application statique : aucun build n'est nécessaire. Les fich
   l'utilisateur choisit ses thèmes, refait les QCM, écoute les fiches, révise 10 minutes ou plusieurs heures, et reprend automatiquement sa progression.
 - Révision des points faibles :
   l'application génère une session ciblée à partir des thèmes non maîtrisés et des scores insuffisants.
+- Quiz par difficulté :
+  l'utilisateur peut réviser en mode facile, moyen, difficile ou certification. Les réponses sont mélangées et la correction n'apparaît qu'après validation.
 - QCM blanc final :
   session de 40 questions mélangées avec indication de préparation : prêt, presque prêt ou à revoir avant certification.
 - Révision audio rapide :
@@ -85,6 +87,8 @@ Le tableau de bord affiche :
 - `Continuer ma progression` : reprend le dernier écran utile ou propose le prochain thème.
 - `Diagnostic` : lance un test court pour situer le niveau du profil actif.
 - `Points faibles` : lance un QCM ciblé sur les thèmes à revoir.
+- `Mode facile`, `Mode moyen`, `Mode difficile` : lance des questions filtrées par niveau.
+- `Quiz certification` : lance un quiz majoritairement composé de questions moyennes et difficiles.
 - `Revoir mes erreurs` : lance un QCM uniquement sur les questions ratées mémorisées.
 - `Faire un QCM complet` : lance toutes les questions disponibles.
 - `QCM blanc final` : lance une session certification avec objectif 80 % minimum.
@@ -101,6 +105,16 @@ Chaque thème contient maintenant :
 - 10 questions QCM avec corrections expliquées ;
 - 3 mises en situation ;
 - un résumé audio naturel.
+
+Le système de QCM utilise maintenant :
+
+- sélection de réponse puis bouton `Valider ma réponse` ;
+- blocage du choix après validation ;
+- mélange des questions et des réponses ;
+- niveaux `easy`, `medium`, `hard` ;
+- corrections détaillées : meilleure réponse, pourquoi les autres options sont moins adaptées, principe FFF, mots-clés ;
+- ajout automatique des erreurs dans les questions à revoir ;
+- suivi des questions maîtrisées après plusieurs réussites.
 
 Un thème dédié `La connaissance du jeu` a été ajouté à partir du module CFI/FOAD :
 

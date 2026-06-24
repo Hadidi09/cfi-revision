@@ -1152,6 +1152,16 @@ p {
   border-radius: var(--radius);
 }
 
+.correction-details {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.correction-details p {
+  margin-bottom: 0;
+}
+
 .feedback.good {
   color: var(--success-ink);
   background: var(--success-bg);

@@ -3062,3 +3062,180 @@ window.CFI_REVISION_DATA.officialProgram = [
     ]
   }
 ];
+
+(() => {
+  const cases = [
+    {
+      themeId: "posture-educateur",
+      question: "Un joueur U11 échoue plusieurs fois et se décourage. Quelle réaction est la plus juste ?",
+      options: [
+        "Le laisser chercher seul pour développer son autonomie.",
+        "Simplifier temporairement la tâche, encourager et donner un objectif atteignable.",
+        "Lui expliquer longtemps devant le groupe pour que tout le monde comprenne.",
+        "Le changer de groupe pour qu'il soit avec les plus faibles."
+      ],
+      answerIndex: 1,
+      difficulty: "hard",
+      explanation: "La meilleure réponse adapte, encourage et maintient l'enfant dans l'activité.",
+      whyCorrect: "Elle sécurise émotionnellement le joueur et lui permet de retrouver une réussite.",
+      whyOthers: [
+        "Le laisser seul peut renforcer le découragement.",
+        "Une longue explication devant le groupe peut exposer l'enfant.",
+        "Changer de groupe peut être vécu comme une sanction."
+      ],
+      principle: "Adapter sans humilier et favoriser la progression.",
+      keywords: ["adaptation", "bienveillance", "progression", "plaisir"]
+    },
+    {
+      themeId: "gestion-parents",
+      question: "Un parent critique tes choix pendant un plateau. Quelle réponse tient le mieux le cadre ?",
+      options: [
+        "Répondre tout de suite devant les enfants.",
+        "Modifier tes choix pour calmer le parent.",
+        "Rester calme, protéger le groupe et proposer un échange à un moment adapté.",
+        "Ignorer le parent même s'il perturbe l'activité."
+      ],
+      answerIndex: 2,
+      difficulty: "hard",
+      explanation: "L'éducateur garde le cadre et traite l'échange au bon moment.",
+      whyCorrect: "Cette réponse évite l'escalade, protège les enfants et conserve une posture éducative.",
+      whyOthers: [
+        "Répondre devant les enfants met le conflit au centre.",
+        "Changer ses choix sous pression fragilise le cadre.",
+        "Ignorer durablement laisse la tension s'installer."
+      ],
+      principle: "Communiquer calmement sans perdre le cadre collectif.",
+      keywords: ["cadre", "calme", "respect", "communication"]
+    },
+    {
+      themeId: "violence-discrimination-respect",
+      question: "Un joueur est moqué après une erreur technique. Quelle intervention est prioritaire ?",
+      options: [
+        "Stopper brièvement, protéger le joueur, nommer le comportement et rappeler le respect.",
+        "Attendre la fin de séance pour ne pas couper le rythme.",
+        "Dire au joueur moqué qu'il doit être plus solide mentalement.",
+        "Punir tout le groupe par une course."
+      ],
+      answerIndex: 0,
+      difficulty: "hard",
+      explanation: "La priorité est de protéger et de réinstaller un climat de respect.",
+      whyCorrect: "L'éducateur traite le comportement sans humilier et sécurise l'enfant ciblé.",
+      whyOthers: [
+        "Attendre laisse la moquerie produire ses effets.",
+        "Demander à la victime d'être plus solide inverse la responsabilité.",
+        "Punir tout le groupe ne traite pas clairement le comportement."
+      ],
+      principle: "Tolérance zéro sur les humiliations, avec un recadrage calme.",
+      keywords: ["respect", "protection", "bienveillance", "climat positif"]
+    },
+    {
+      themeId: "securite",
+      question: "Un enfant arrive sans équipement adapté. Quelle décision est la plus professionnelle ?",
+      options: [
+        "Le faire participer normalement pour ne pas le frustrer.",
+        "Évaluer le risque, adapter ou limiter la participation, puis prévenir si nécessaire.",
+        "Le renvoyer sans explication.",
+        "Lui prêter n'importe quel matériel disponible."
+      ],
+      answerIndex: 1,
+      difficulty: "medium",
+      explanation: "La sécurité passe avant la participation, tout en restant éducatif.",
+      whyCorrect: "L'éducateur protège l'enfant et cherche une solution adaptée.",
+      whyOthers: [
+        "Participer sans équipement peut créer un risque.",
+        "Renvoyer sans explication manque de bienveillance.",
+        "Un matériel inadapté peut créer un autre risque."
+      ],
+      principle: "Sécuriser d'abord, adapter ensuite.",
+      keywords: ["sécurité", "adaptation", "responsabilité", "famille"]
+    },
+    {
+      themeId: "pedagogie-apprentissage",
+      question: "Un exercice crée beaucoup d'attente et peu de ballons touchés. Quel ajustement est prioritaire ?",
+      options: [
+        "Garder l'exercice prévu pour respecter la séance écrite.",
+        "Ajouter davantage de consignes.",
+        "Réduire l'attente, multiplier les passages et simplifier l'organisation.",
+        "Arrêter tout et faire uniquement un match libre."
+      ],
+      answerIndex: 2,
+      difficulty: "hard",
+      explanation: "L'éducateur remet les enfants en activité avec des répétitions utiles.",
+      whyCorrect: "Moins d'attente et plus d'actions favorisent l'apprentissage par le jeu.",
+      whyOthers: [
+        "Respecter la fiche malgré l'échec bloque l'apprentissage.",
+        "Ajouter des consignes peut ralentir encore plus.",
+        "Le match libre ne répond pas toujours à l'objectif travaillé."
+      ],
+      principle: "Observer, simplifier et remettre rapidement en activité.",
+      keywords: ["activité", "répétition", "apprentissage par le jeu", "adaptation"]
+    },
+    {
+      themeId: "developpement-enfant",
+      question: "Deux U12 ont le même âge mais un gros écart de maturité. Quelle lecture est la plus juste ?",
+      options: [
+        "Le plus mature doit forcément jouer avec les plus grands.",
+        "Le moins mature manque surtout d'envie.",
+        "L'âge ne suffit pas : il faut observer maturité, confiance et vécu.",
+        "Il faut imposer exactement les mêmes contraintes à tous."
+      ],
+      answerIndex: 2,
+      difficulty: "medium",
+      explanation: "La croissance et la maturité varient fortement chez les enfants.",
+      whyCorrect: "L'éducateur observe l'enfant réel et adapte sans étiqueter.",
+      whyOthers: [
+        "Surclasser automatiquement peut être inadapté.",
+        "Relier la maturité à l'envie est une erreur.",
+        "L'équité consiste parfois à adapter les moyens."
+      ],
+      principle: "Adapter aux différences individuelles.",
+      keywords: ["maturité", "croissance", "adaptation", "confiance"]
+    }
+  ];
+
+  const keywordsByTheme = {
+    securite: ["sécurité", "prévention", "responsabilité", "cadre"],
+    "violence-discrimination-respect": ["respect", "protection", "discrimination", "cadre"],
+    "climat-entrainement": ["plaisir", "climat positif", "droit à l'erreur", "engagement"],
+    "posture-educateur": ["bienveillance", "encouragement", "exemplarité", "adaptation"],
+    "pedagogie-apprentissage": ["apprentissage par le jeu", "répétition", "questionnement", "adaptation"],
+    "developpement-enfant": ["maturité", "croissance", "confiance", "différences individuelles"]
+  };
+
+  function difficulty(question, index) {
+    if (question.difficulty) return question.difficulty;
+    if (/parent|moqu|discrimin|refuse|dispute|crie|attente|maturit|équipement|perd/i.test(question.question)) {
+      return "hard";
+    }
+    return index % 3 === 0 ? "easy" : index % 3 === 1 ? "medium" : "hard";
+  }
+
+  function enrich(theme, question, index) {
+    question.difficulty = difficulty(question, index);
+    question.keywords ||= keywordsByTheme[theme.id] || ["sécurité", "plaisir", "progression", "respect"];
+    question.whyCorrect ||= question.explanation;
+    question.principle ||=
+      "La réponse attendue privilégie la sécurité, l'adaptation au niveau des enfants, le respect et la progression.";
+    question.whyOthers ||= question.options
+      .map((option, optionIndex) => {
+        const correct = Array.isArray(question.answerIndexes)
+          ? question.answerIndexes.includes(optionIndex)
+          : question.answerIndex === optionIndex;
+        return correct
+          ? null
+          : `${option} : moins adapté car cette option ne répond pas complètement aux principes FFF.`;
+      })
+      .filter(Boolean);
+  }
+
+  for (const item of cases) {
+    const theme = window.CFI_REVISION_DATA.themes.find((entry) => entry.id === item.themeId);
+    if (!theme || theme.quiz.some((question) => question.question === item.question)) continue;
+    const { themeId, ...question } = item;
+    theme.quiz.push(question);
+  }
+
+  for (const theme of window.CFI_REVISION_DATA.themes) {
+    theme.quiz.forEach((question, index) => enrich(theme, question, index));
+  }
+})();

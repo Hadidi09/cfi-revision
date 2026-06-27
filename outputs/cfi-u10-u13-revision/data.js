@@ -420,29 +420,236 @@ window.CFI_REVISION_DATA = {
       shortTitle: "Développement",
       duration: "18 min",
       summary:
-        "Tenir compte de la croissance, de la maturité et des différences entre enfants.",
+        "Comprendre le développement humain, distinguer croissance et maturation, puis adapter sa pédagogie au rythme de chaque enfant.",
       sheet: [
-        "En U10-U13, les enfants n'avancent pas tous au même rythme. Deux joueurs du même âge civil peuvent avoir des différences importantes de taille, de force, de coordination, de confiance et de maturité.",
-        "La croissance peut influencer la motricité, la fatigue, la concentration et l'image de soi. Certains enfants paraissent très à l'aise, d'autres traversent une période de maladresse.",
-        "L'éducateur doit adapter ses attentes. Il ne réduit pas l'enfant à son gabarit ou à son niveau du moment. Il valorise les progrès, l'engagement, les choix et la coopération.",
-        "Le football doit rester un espace d'apprentissage progressif. On évite de spécialiser trop tôt, de surcharger physiquement ou de comparer brutalement les enfants."
+        "Le développement humain est le processus long et progressif par lequel une personne acquiert et améliore ses ressources physiques, psychologiques et sociales.",
+        "Deux mécanismes distincts mais liés y participent : la croissance et la maturation. Ils ne sont pas synonymes et ne progressent pas forcément au même rythme.",
+        "Pendant l'enfance et autour de la puberté, les changements peuvent modifier la coordination, la fatigue, la confiance et les repères corporels. Deux jeunes du même âge civil peuvent donc présenter des profils très différents.",
+        "L'éducateur anticipe ces différences, adapte les contenus et valorise les progrès individuels. Il ne compare pas les enfants entre eux et ne réduit jamais un joueur à son gabarit du moment."
       ],
+      lessonFocus: {
+        eyebrow: "À connaître par cœur",
+        title: "Croissance et maturation : deux mécanismes différents",
+        intro:
+          "Les deux mécanismes sont interconnectés, mais ils décrivent des évolutions différentes du développement humain.",
+        terms: [
+          {
+            title: "Croissance",
+            definition:
+              "Augmentation de la taille, du poids et de la stature d'un individu.",
+            examples: [
+              "Allongement des bras et des jambes",
+              "Prise de poids",
+              "Augmentation du volume musculaire"
+            ]
+          },
+          {
+            title: "Maturation",
+            definition:
+              "Amélioration de la fonction d'un organe ou d'un système biologique.",
+            examples: [
+              "Développement du système nerveux",
+              "Développement du système cardiovasculaire",
+              "Développement des organes reproducteurs"
+            ]
+          }
+        ],
+        stages: [
+          {
+            title: "Petite enfance",
+            note: "Catégories 0 à U5 dans le découpage présenté par le module."
+          },
+          {
+            title: "Grande enfance",
+            note: "Catégories U6 à U13 : c'est le stade de référence pour le public de ce CFI."
+          },
+          {
+            title: "Adolescence",
+            note: "Catégories U14 à U19, avec des changements importants autour de la puberté."
+          },
+          {
+            title: "Âge adulte",
+            note: "Catégorie Seniors dans le découpage présenté par le module."
+          }
+        ],
+        facets: [
+          {
+            title: "Physique",
+            definition:
+              "Les changements du corps, le développement des compétences motrices et l'amélioration de la coordination.",
+            coachFocus:
+              "Observer la motricité, la fatigue, les repères corporels et la capacité à réagir aux situations."
+          },
+          {
+            title: "Psychologique",
+            definition:
+              "L'évolution de la pensée, du raisonnement, du langage, de la résolution de problèmes, de la créativité et de la prise de décision.",
+            coachFocus:
+              "Tenir compte de la compréhension, des émotions, de la confiance et de la capacité à faire des choix."
+          },
+          {
+            title: "Social",
+            definition:
+              "La manière d'interagir avec les autres, de construire des relations et d'apprendre les normes, les valeurs et les comportements du groupe.",
+            coachFocus:
+              "Observer la coopération, la communication, la place dans le groupe et le respect des autres."
+          }
+        ],
+        publicModule: {
+          title: "Connaître les joueurs et joueuses U10-U13",
+          intro:
+            "Le module distingue les profils U10-U11 et U12-U13 au sein de la grande enfance. Ces repères aident à interpréter les caractéristiques sociales, physiques et psychologiques, puis à adapter la posture et la pédagogie.",
+          identity: [
+            "Repère d'âge du module : 9 à 10 ans",
+            "Repère scolaire du module : école élémentaire, CM1-CM2",
+            "Étape de formation : passage de l'éveil à l'initiation, apprendre progressivement à s'entraîner"
+          ],
+          dimensions: [
+            {
+              title: "Social",
+              characteristics: [
+                "La famille reste un facteur d'équilibre.",
+                "La volonté d'apprendre et de progresser est forte.",
+                "Des groupes se forment entre joueurs et joueuses.",
+                "Les premières responsabilités apparaissent."
+              ],
+              implications: [
+                "Entretenir la relation avec les familles et expliquer objectifs, règles et compétition.",
+                "Construire un cadre sécurisant, éducatif et cohérent.",
+                "Alterner les initiatives individuelles et collectives.",
+                "Rester attentif aux enfants fragiles ou qui se dévalorisent vite.",
+                "Être disponible, constant et bon communicant."
+              ]
+            },
+            {
+              title: "Physique",
+              characteristics: [
+                "Les premières différences liées à la prépuberté peuvent apparaître.",
+                "L'amplitude de certains gestes peut diminuer temporairement.",
+                "La croissance peut entraîner fatigue et douleurs musculaires, articulaires ou tendineuses.",
+                "Le schéma corporel continue de se consolider."
+              ],
+              implications: [
+                "Éviter les répétitions traumatisantes, notamment les sauts trop nombreux.",
+                "Poursuivre le travail de réactivité et de fréquence des appuis.",
+                "Équilibrer les temps d'effort et de repos.",
+                "Développer la coordination avec et sans ballon grâce à des enchaînements variés."
+              ]
+            },
+            {
+              title: "Psychologique",
+              characteristics: [
+                "L'enfant peut raisonner sur des schémas collectifs simples.",
+                "L'altruisme et l'attention portée aux autres se développent.",
+                "Le besoin de s'affirmer devient plus présent.",
+                "La capacité de remise en cause progresse."
+              ],
+              implications: [
+                "Commencer une éducation tactique simple.",
+                "Faire découvrir les choix et les intentions tactiques par des règles d'action.",
+                "Mettre la technique au service d'une réponse au problème de jeu.",
+                "Utiliser le jeu comme principal outil de développement."
+              ]
+            }
+          ],
+          additionalProfiles: [
+            {
+              title: "Profil U12-U13",
+              identity: [
+                "Repère d'âge du module : 11 à 12 ans",
+                "Repère scolaire du module : collège, 6e-5e",
+                "Étape de formation : initiation, apprendre à s'entraîner"
+              ],
+              dimensions: [
+                {
+                  title: "Social",
+                  characteristics: [
+                    "Les premières oppositions peuvent apparaître dans le cadre familial.",
+                    "La volonté d'apprendre et de progresser reste présente.",
+                    "Des groupes se forment entre joueurs et joueuses.",
+                    "L'attachement aux couleurs du club se développe."
+                  ],
+                  implications: [
+                    "Entretenir la relation avec les familles et expliquer attentes, objectifs et règles de vie.",
+                    "Construire un cadre sécurisant, éducatif et cohérent.",
+                    "Responsabiliser progressivement les jeunes.",
+                    "Développer l'esprit club et l'esprit d'équipe.",
+                    "Être disponible, constant et bon communicant."
+                  ]
+                },
+                {
+                  title: "Physique",
+                  characteristics: [
+                    "Des douleurs articulaires ou musculaires peuvent accompagner la croissance.",
+                    "Le module évoque la maturation progressive des systèmes nerveux, pulmonaire et cardiovasculaire.",
+                    "L'amplitude gestuelle peut diminuer temporairement.",
+                    "Fatigue, fragilité et perturbation du schéma corporel peuvent accompagner l'allongement des membres.",
+                    "Le pic de croissance peut être particulièrement visible chez les jeunes filles."
+                  ],
+                  implications: [
+                    "Développer les qualités physiques en tenant compte du pic de croissance observé.",
+                    "Proposer des exercices de prévention de type ESVP, selon le repère donné par le module.",
+                    "Poursuivre le travail de vitesse de réaction et de fréquence des appuis.",
+                    "Utiliser le jeu et les situations comme outils de développement physique.",
+                    "Retravailler la coordination générale avec et sans ballon.",
+                    "Surveiller la croissance et les signaux de fatigue sans comparer les jeunes."
+                  ]
+                },
+                {
+                  title: "Psychologique",
+                  characteristics: [
+                    "L'esprit critique se développe.",
+                    "Le jeune peut raisonner sur des schémas collectifs plus complexes.",
+                    "Il recherche sa personnalité.",
+                    "Le besoin de confiance en soi est important."
+                  ],
+                  implications: [
+                    "Questionner pour développer l'esprit critique.",
+                    "Faire découvrir les choix, les intentions tactiques et les principes de jeu.",
+                    "Aider à décrypter les différentes phases de jeu.",
+                    "Varier les apprentissages techniques au service des réponses tactiques et dans des conditions proches du jeu."
+                  ]
+                }
+              ],
+              note:
+                "Le module donne comme moyennes un pic de croissance autour de 12 ans chez les filles et 14 ans chez les garçons. Ce sont des repères généraux : le moment et le rythme restent individuels."
+            }
+          ]
+        },
+        conclusion: {
+          title: "Et l'éducateur dans tout ça ?",
+          paragraphs: [
+            "Le développement dépend aussi du contexte social, culturel et familial. Le club de football fait partie intégrante de cet environnement.",
+            "Chaque jeune se développe à son propre rythme et rencontre des défis différents. Un environnement positif et bienveillant doit favoriser son épanouissement et ses apprentissages.",
+            "Dans le module U10-U13, les U10-U11 développent leurs capacités collectives et tactiques, tandis que les U12-U13 expriment davantage de revendications et développent leur raisonnement critique."
+          ]
+        },
+        reminder:
+          "Les quatre stades et les trois facettes donnent des repères, mais le développement reste individuel et global. Ne classe pas automatiquement un enfant à partir de sa seule catégorie : observe ses ressources du moment et concentre-toi sur ses progrès."
+      },
       essentials: [
-        "Distinguer âge civil, maturité et niveau de pratique.",
-        "Adapter les charges et les contraintes.",
-        "Valoriser les progrès individuels.",
-        "Respecter les différences de rythme.",
-        "Rester attentif à la fatigue et à la confiance."
+        "Le développement concerne les ressources physiques, psychologiques et sociales.",
+        "La croissance correspond à l'augmentation de la taille, du poids et de la stature.",
+        "La maturation correspond à l'amélioration du fonctionnement des organes et systèmes biologiques.",
+        "Le développement est progressif, individuel et différent d'un enfant à l'autre.",
+        "Autour de la puberté, adapter les contenus aux ressources, à la fatigue et à la confiance du moment.",
+        "Chez les U10-U11, construire un cadre sécurisant, communiquer avec les familles et valoriser les premières responsabilités.",
+        "Le jeu aide les U10-U11 à comprendre des choix tactiques simples tout en développant leur technique.",
+        "Chez les U12-U13, responsabiliser, développer l'esprit d'équipe et utiliser le questionnement pour nourrir l'esprit critique.",
+        "Pendant un pic de croissance, renforcer prévention, coordination et récupération en observant chaque jeune individuellement.",
+        "Le module rattache le public U10-U13 aux étapes Éveil et Initiation de la formation du footballeur."
       ],
       mistakes: [
+        "Employer croissance et maturation comme des synonymes.",
         "Confondre grand gabarit et maturité complète.",
-        "Exiger la même réponse de tous les enfants.",
-        "Comparer publiquement les niveaux.",
-        "Surcharger physiquement un enfant fatigué.",
-        "Étiqueter trop tôt un joueur comme faible ou fort."
+        "Exiger la même réponse physique, motrice ou cognitive de tous les enfants.",
+        "Comparer publiquement les jeunes ou leur mettre une pression inutile.",
+        "Étiqueter trop tôt un joueur comme faible ou fort à partir de son niveau actuel.",
+        "Multiplier les répétitions physiques traumatisantes sans équilibrer effort et récupération.",
+        "Présenter la tactique comme un discours abstrait au lieu de la faire découvrir dans le jeu."
       ],
       oralScript:
-        "Entre 10 et 13 ans, les différences sont normales. Un enfant peut grandir vite, perdre un peu de coordination, manquer de confiance ou au contraire être en avance physiquement. Ton rôle est d'adapter, pas de coller une étiquette. Tu regardes le progrès, l'effort, la compréhension du jeu et la capacité à rester engagé.",
+        "Retenons les repères du module. Il distingue quatre stades : la petite enfance de zéro à U5, la grande enfance de U6 à U13, l'adolescence de U14 à U19, puis l'âge adulte pour les Seniors. Pour les U10-U13, les étapes de formation concernées sont l'Éveil et l'Initiation. Le développement s'observe selon trois facettes : physique, psychologique et sociale. La croissance, c'est l'augmentation de la taille, du poids et de la stature. La maturation, c'est l'amélioration du fonctionnement d'un organe ou d'un système biologique. Pour les U10-U11, la famille reste importante, les premières responsabilités apparaissent et l'enfant commence à raisonner sur des schémas collectifs simples. Pour les U12-U13, l'esprit critique, la recherche de personnalité et la compréhension de schémas collectifs plus complexes progressent. Responsabilise les jeunes et développe l'esprit d'équipe. Observe aussi les douleurs, la fatigue, la coordination et les changements liés au pic de croissance. Le module donne une moyenne autour de douze ans chez les filles et quatorze ans chez les garçons, mais chaque rythme reste individuel. Construis un cadre sécurisant, dose effort et repos, propose notamment la prévention de type ESVP indiquée par le module et utilise le jeu pour faire découvrir les choix tactiques. Adapte toujours sans comparer.",
       quiz: [
         {
           question: "Deux enfants du même âge civil peuvent...",
@@ -503,6 +710,485 @@ window.CFI_REVISION_DATA = {
           answerIndex: 0,
           explanation:
             "La formation doit rester ouverte, variée et adaptée au développement global."
+        },
+        {
+          question: "Dans le module, comment définit-on la croissance ?",
+          options: [
+            "L'augmentation de la taille, du poids et de la stature",
+            "L'amélioration de la fonction d'un organe",
+            "L'acquisition des règles du football",
+            "La confiance ressentie avant un match"
+          ],
+          answerIndex: 0,
+          explanation:
+            "La croissance décrit des changements quantitatifs comme la taille, le poids ou la stature."
+        },
+        {
+          question: "Dans le module, comment définit-on la maturation ?",
+          options: [
+            "L'augmentation de la taille uniquement",
+            "L'amélioration de la fonction d'un organe ou d'un système biologique",
+            "La comparaison entre deux enfants du même âge",
+            "Le nombre d'années de pratique sportive"
+          ],
+          answerIndex: 1,
+          explanation:
+            "La maturation concerne le fonctionnement progressif des organes et des systèmes biologiques."
+        },
+        {
+          question:
+            "Parmi ces phénomènes, lesquels relèvent du processus de croissance ?",
+          options: [
+            "L'augmentation de la masse musculaire",
+            "Le développement du système nerveux",
+            "L'apparition des menstruations",
+            "L'allongement des bras et des jambes"
+          ],
+          answerIndexes: [0, 3],
+          explanation:
+            "L'augmentation de la masse musculaire et l'allongement des membres sont des changements de taille ou de masse. Le développement du système nerveux et l'apparition des menstruations relèvent de la maturation biologique."
+        },
+        {
+          question: "Quels exemples relèvent principalement de la maturation ?",
+          options: [
+            "Le développement du système nerveux",
+            "L'allongement des jambes",
+            "Le développement du système cardiovasculaire",
+            "Le développement des organes reproducteurs",
+            "La prise de poids"
+          ],
+          answerIndexes: [0, 2, 3],
+          explanation:
+            "Ces exemples concernent l'évolution du fonctionnement d'organes ou de systèmes biologiques."
+        },
+        {
+          question: "Croissance et maturation sont deux mots synonymes.",
+          options: ["Vrai", "Faux"],
+          answerIndex: 1,
+          explanation:
+            "Faux. Les mécanismes sont liés, mais la croissance décrit surtout l'augmentation de taille ou de masse, tandis que la maturation concerne le fonctionnement biologique."
+        },
+        {
+          question: "Autour d'un pic de croissance, quelle conduite est la plus juste pour l'éducateur ?",
+          options: [
+            "Maintenir exactement les mêmes exigences pour tous",
+            "Comparer les joueurs pour identifier ceux qui sont en avance",
+            "Observer les ressources du moment et adapter contenus, contraintes et récupération",
+            "Supprimer toute activité physique jusqu'à la fin de la croissance"
+          ],
+          answerIndex: 2,
+          explanation:
+            "L'éducateur anticipe les changements, surveille fatigue et coordination, puis adapte sans exclure ni comparer."
+        },
+        {
+          question: "Quels sont les quatre stades du développement humain présentés dans le module ?",
+          options: [
+            "La petite enfance",
+            "La grande enfance",
+            "La préadolescence",
+            "L'adolescence",
+            "L'âge adulte"
+          ],
+          answerIndexes: [0, 1, 3, 4],
+          explanation:
+            "Le module distingue la petite enfance, la grande enfance, l'adolescence et l'âge adulte. La préadolescence n'est pas présentée ici comme un cinquième stade."
+        },
+        {
+          question: "Comment l'éducateur doit-il utiliser ces quatre stades ?",
+          options: [
+            "Comme des repères à compléter par l'observation de chaque enfant",
+            "Comme un classement rigide déterminé uniquement par la catégorie",
+            "Pour imposer les mêmes attentes à tous les joueurs d'un stade",
+            "Pour sélectionner définitivement les enfants les plus avancés"
+          ],
+          answerIndex: 0,
+          explanation:
+            "Les stades aident à comprendre le développement, mais ne remplacent jamais l'observation des différences individuelles."
+        },
+        {
+          question: "Quelles sont les trois facettes du développement humain présentées dans le module ?",
+          options: [
+            "La facette physique",
+            "La facette psychologique",
+            "La facette tactique",
+            "La facette sociale"
+          ],
+          answerIndexes: [0, 1, 3],
+          explanation:
+            "Le module présente les facettes physique, psychologique et sociale comme trois angles complémentaires du développement humain global."
+        },
+        {
+          question: "Le développement des compétences motrices et de la coordination relève principalement de quelle facette ?",
+          options: ["Physique", "Psychologique", "Sociale", "Administrative"],
+          answerIndex: 0,
+          explanation:
+            "La motricité, les mouvements et la coordination appartiennent principalement à la facette physique."
+        },
+        {
+          question: "La pensée, les émotions et la prise de décision relèvent principalement de quelle facette ?",
+          options: ["Sociale", "Physique", "Psychologique", "Réglementaire"],
+          answerIndex: 2,
+          explanation:
+            "La facette psychologique comprend les dimensions cognitives et affectives : comprendre, raisonner, décider, reconnaître et exprimer ses émotions."
+        },
+        {
+          question: "L'apprentissage des relations, des normes et des valeurs du groupe relève principalement de quelle facette ?",
+          options: ["Physique", "Technique", "Psychologique", "Sociale"],
+          answerIndex: 3,
+          explanation:
+            "La facette sociale concerne les interactions, les relations et l'apprentissage des normes, valeurs et comportements collectifs."
+        },
+        {
+          question: "Dans quel ordre se déroulent les quatre stades présentés dans le module ?",
+          options: [
+            "Petite enfance, grande enfance, adolescence, âge adulte",
+            "Grande enfance, petite enfance, âge adulte, adolescence",
+            "Petite enfance, adolescence, grande enfance, âge adulte",
+            "Petite enfance, préadolescence, adolescence, âge adulte"
+          ],
+          answerIndex: 0,
+          explanation:
+            "L'ordre présenté est : petite enfance, grande enfance, adolescence puis âge adulte."
+        },
+        {
+          question: "Quelles correspondances entre stades et catégories sont celles du module ?",
+          options: [
+            "Petite enfance : 0 à U5",
+            "Grande enfance : U6 à U13",
+            "Adolescence : U14 à U19",
+            "Âge adulte : Seniors",
+            "Grande enfance : U14 à U19"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "Le module associe 0-U5 à la petite enfance, U6-U13 à la grande enfance, U14-U19 à l'adolescence et les Seniors à l'âge adulte."
+        },
+        {
+          question: "Dans le découpage du module, le public U10-U13 appartient principalement à quel stade ?",
+          options: ["Petite enfance", "Grande enfance", "Adolescence", "Âge adulte"],
+          answerIndex: 1,
+          explanation:
+            "Les catégories U6 à U13 sont rattachées à la grande enfance dans le module."
+        },
+        {
+          question: "Quels contextes participent au développement d'un jeune ?",
+          options: [
+            "Le contexte social",
+            "Le contexte culturel",
+            "Le contexte familial",
+            "L'environnement proposé par le club",
+            "Uniquement son niveau technique"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "Le développement est influencé par les contextes social, culturel et familial. Le club fait partie de cet environnement."
+        },
+        {
+          question: "Quel rôle le club doit-il jouer dans le développement des jeunes ?",
+          options: [
+            "Créer un environnement positif et bienveillant favorisant épanouissement et apprentissages",
+            "Comparer en permanence les enfants du même âge",
+            "Se concentrer uniquement sur les résultats",
+            "Imposer un parcours identique à tous"
+          ],
+          answerIndex: 0,
+          explanation:
+            "Le club accompagne des jeunes aux rythmes différents et doit construire un cadre positif, bienveillant et favorable aux apprentissages."
+        },
+        {
+          question: "Le développement d'un individu dépend aussi de ses contextes social, culturel, familial et sportif.",
+          options: ["Vrai", "Faux"],
+          answerIndex: 0,
+          explanation:
+            "Vrai. Le club de football appartient à l'environnement du jeune et participe donc au contexte dans lequel il se développe."
+        },
+        {
+          question: "Selon le repère général présenté dans le module, les différences de croissance entre filles et garçons deviennent surtout marquées autour de la puberté.",
+          options: ["Vrai", "Faux"],
+          answerIndex: 0,
+          explanation:
+            "Vrai dans le repère pédagogique du module. L'éducateur doit néanmoins observer chaque jeune, car le moment et le rythme des changements restent individuels."
+        },
+        {
+          question: "Sur quels trois plans le module invite-t-il à observer les U10-U11 ?",
+          options: [
+            "Le plan social",
+            "Le plan physique",
+            "Le plan psychologique",
+            "Le plan commercial"
+          ],
+          answerIndexes: [0, 1, 2],
+          explanation:
+            "Les caractéristiques sociales, physiques et psychologiques se complètent pour comprendre le jeune dans sa globalité."
+        },
+        {
+          question: "Quelles caractéristiques sociales sont associées aux U10-U11 dans le module ?",
+          options: [
+            "La famille reste un facteur d'équilibre",
+            "La volonté d'apprendre et de progresser",
+            "La formation de groupes entre joueurs et joueuses",
+            "Les premières responsabilités",
+            "Le rejet systématique de toute règle"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "Le module souligne le rôle de la famille, l'envie d'apprendre, la vie en groupes et l'apparition des premières responsabilités."
+        },
+        {
+          question: "Quelle posture répond le mieux aux besoins sociaux des U10-U11 ?",
+          options: [
+            "Communiquer avec les familles, poser un cadre sécurisant et proposer des responsabilités adaptées",
+            "Écarter les familles pour rendre les enfants autonomes plus vite",
+            "Laisser chaque groupe fixer seul toutes les règles",
+            "Réserver son attention aux enfants déjà confiants"
+          ],
+          answerIndex: 0,
+          explanation:
+            "L'éducateur reste disponible et cohérent, explique le cadre aux familles et accompagne les premières initiatives sans abandonner les enfants fragiles."
+        },
+        {
+          question: "Quels signes physiques peuvent être observés chez les U10-U11 selon le module ?",
+          options: [
+            "Des différences liées à la prépuberté",
+            "Une fatigabilité ou des douleurs liées à la croissance",
+            "Une possible diminution temporaire de l'amplitude gestuelle",
+            "Un schéma corporel encore en consolidation",
+            "Une maturité physique identique pour tous"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "Les évolutions corporelles sont variables. L'éducateur observe la fatigue, les douleurs, la coordination et les différences individuelles."
+        },
+        {
+          question: "Comment adapter la séance aux caractéristiques physiques des U10-U11 ?",
+          options: [
+            "Multiplier les sauts jusqu'à la fatigue pour accélérer la progression",
+            "Équilibrer effort et repos, varier les coordinations et limiter les répétitions traumatisantes",
+            "Supprimer toutes les activités dynamiques",
+            "Imposer la même charge à tous sans observer"
+          ],
+          answerIndex: 1,
+          explanation:
+            "Le module recommande de préserver le joueur, de doser la charge et de travailler réactivité, appuis et coordination avec des situations variées."
+        },
+        {
+          question: "Quelles caractéristiques psychologiques sont associées aux U10-U11 ?",
+          options: [
+            "Raisonner sur des schémas collectifs simples",
+            "Développer l'altruisme et l'attention aux autres",
+            "Ressentir le besoin de s'affirmer",
+            "Progresser dans la capacité de remise en cause",
+            "Être incapable de faire un choix dans le jeu"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "À cet âge, la compréhension collective, l'attention aux autres, l'affirmation de soi et la réflexion progressent."
+        },
+        {
+          question: "Quel outil doit rester central pour développer la compréhension tactique des U10-U11 ?",
+          options: [
+            "Le jeu et les problèmes simples à résoudre",
+            "Un cours théorique long sans ballon",
+            "La répétition technique sans intention",
+            "Le classement permanent des joueurs"
+          ],
+          answerIndex: 0,
+          explanation:
+            "Le jeu permet de faire émerger les choix, les intentions tactiques et les règles d'action. La technique sert ensuite la réponse au problème rencontré."
+        },
+        {
+          question: "Un U11 se plaint de fatigue et perd en coordination pendant des séries de sauts. Quelle décision est la plus adaptée ?",
+          options: [
+            "Augmenter le nombre de répétitions pour qu'il s'habitue",
+            "Le comparer au joueur le plus résistant",
+            "Réduire la charge, vérifier son état et proposer une coordination moins traumatisante",
+            "L'exclure définitivement des exercices physiques"
+          ],
+          answerIndex: 2,
+          explanation:
+            "L'éducateur observe les signes du moment, limite les répétitions traumatisantes et adapte l'effort sans humilier ni exclure."
+        },
+        {
+          question: "Pourquoi entretenir une relation avec les familles des U10-U11 ?",
+          options: [
+            "Pour expliquer les objectifs, les règles et la place de la compétition dans un cadre éducatif",
+            "Pour leur demander de diriger les séances",
+            "Pour commenter publiquement le niveau des autres enfants",
+            "Pour garantir un résultat sportif"
+          ],
+          answerIndex: 0,
+          explanation:
+            "La famille est un facteur d'équilibre. Une communication claire aide à partager le cadre éducatif et à sécuriser l'enfant."
+        },
+        {
+          question: "Quels repères figurent sur la carte d'identité U10-U11 du module ?",
+          options: [
+            "9 à 10 ans",
+            "École élémentaire, CM1-CM2",
+            "Passage de l'éveil à l'initiation",
+            "Apprendre progressivement à s'entraîner",
+            "Études supérieures"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "Ce sont les repères pédagogiques présentés par la carte du module. Ils aident à situer le public mais ne remplacent pas l'observation individuelle."
+        },
+        {
+          question: "Quels repères figurent sur la carte d'identité U12-U13 du module ?",
+          options: [
+            "11 à 12 ans",
+            "Collège, 6e-5e",
+            "Étape d'initiation",
+            "Apprendre à s'entraîner",
+            "École maternelle"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "La carte du module situe les U12-U13 autour de 11-12 ans, au collège, dans l'étape d'initiation. Ces repères ne remplacent pas l'observation individuelle."
+        },
+        {
+          question: "Quelles caractéristiques sociales sont associées aux U12-U13 dans le module ?",
+          options: [
+            "Les premières oppositions dans le cadre familial",
+            "La volonté d'apprendre et de progresser",
+            "La formation de groupes",
+            "L'attachement aux couleurs du club",
+            "L'absence totale de besoin de cadre"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "Le jeune cherche davantage sa place et peut revendiquer, tout en restant demandeur d'apprentissage, d'appartenance et de repères."
+        },
+        {
+          question: "Quelle posture sociale est la plus adaptée avec des U12-U13 ?",
+          options: [
+            "Responsabiliser, développer l'esprit d'équipe et maintenir un cadre éducatif clair",
+            "Supprimer les règles pour éviter les oppositions",
+            "Confier toute la gestion du groupe aux plus affirmés",
+            "Couper la relation avec les familles"
+          ],
+          answerIndex: 0,
+          explanation:
+            "L'éducateur reste disponible et cohérent, dialogue avec les familles et donne des responsabilités adaptées pour construire l'esprit club."
+        },
+        {
+          question: "Quels effets peuvent accompagner la croissance chez les U12-U13 ?",
+          options: [
+            "Des douleurs articulaires ou musculaires",
+            "Une fatigue plus marquée",
+            "Une perturbation temporaire du schéma corporel",
+            "Une diminution possible de l'amplitude gestuelle",
+            "Une coordination toujours meilleure, sans variation"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "L'allongement des membres et les changements corporels peuvent modifier fatigue, douleurs, amplitude et coordination. Ces effets varient selon chaque jeune."
+        },
+        {
+          question: "Quelles adaptations physiques sont pertinentes pendant un pic de croissance ?",
+          options: [
+            "Proposer de la prévention et surveiller les signaux de fatigue",
+            "Retravailler la coordination avec et sans ballon",
+            "Imposer une charge identique à tout le groupe",
+            "Utiliser le jeu et des situations adaptées pour développer les qualités physiques",
+            "Comparer les rythmes de croissance devant le groupe"
+          ],
+          answerIndexes: [0, 1, 3],
+          explanation:
+            "Prévention, coordination, dosage de la charge et situations de jeu adaptées permettent d'accompagner la croissance sans stigmatiser."
+        },
+        {
+          question: "Quelles caractéristiques psychologiques sont associées aux U12-U13 ?",
+          options: [
+            "Le développement de l'esprit critique",
+            "La recherche de sa personnalité",
+            "Le besoin de confiance en soi",
+            "La capacité à raisonner sur des schémas collectifs plus complexes",
+            "L'impossibilité de comprendre les phases de jeu"
+          ],
+          answerIndexes: [0, 1, 2, 3],
+          explanation:
+            "L'esprit critique, l'affirmation personnelle, la confiance et la compréhension collective progressent, avec des rythmes individuels."
+        },
+        {
+          question: "Comment exploiter l'esprit critique qui se développe chez les U12-U13 ?",
+          options: [
+            "Questionner les joueurs et les aider à justifier leurs choix dans le jeu",
+            "Donner toutes les réponses avant l'action",
+            "Interdire les questions pour conserver l'autorité",
+            "Limiter l'apprentissage à des gestes isolés"
+          ],
+          answerIndex: 0,
+          explanation:
+            "Le questionnement aide le jeune à décrypter les phases de jeu, comprendre les principes et relier technique et intention tactique."
+        },
+        {
+          question: "Quelles moyennes de pic de croissance sont données par le module ?",
+          options: [
+            "Environ 12 ans chez les filles et 14 ans chez les garçons",
+            "Exactement 10 ans pour tous les enfants",
+            "Environ 14 ans chez les filles et 12 ans chez les garçons",
+            "Aucune différence moyenne n'est évoquée"
+          ],
+          answerIndex: 0,
+          explanation:
+            "Le module donne ces moyennes comme repères généraux. Elles ne permettent jamais de prévoir précisément le développement d'un enfant."
+        },
+        {
+          question: "Une U13 grandit rapidement, se plaint de douleurs et perd ses repères avec le ballon. Que fais-tu d'abord ?",
+          options: [
+            "J'observe son état, j'adapte la charge et je propose un travail coordonné moins contraignant",
+            "Je lui demande de rattraper son retard avec davantage de répétitions",
+            "Je la compare aux autres joueuses de son âge",
+            "Je conclus qu'elle manque de motivation"
+          ],
+          answerIndex: 0,
+          explanation:
+            "Les signes peuvent accompagner un pic de croissance. L'éducateur sécurise, adapte, favorise la prévention et oriente vers le protocole du club si la douleur persiste."
+        },
+        {
+          question: "Quelle évolution distingue surtout le profil U12-U13 du profil U10-U11 dans le module ?",
+          options: [
+            "Une compréhension de schémas collectifs plus complexes et un esprit critique plus développé",
+            "La disparition du besoin de confiance",
+            "L'absence de relation avec la famille",
+            "L'inutilité du jeu pour apprendre"
+          ],
+          answerIndex: 0,
+          explanation:
+            "Le module décrit une progression de la compréhension collective et de l'esprit critique, tout en maintenant le besoin de cadre, de confiance et d'apprentissage par le jeu."
+        },
+        {
+          question: "Quelles étapes de formation du footballeur concernent le public U10-U13 dans le module ?",
+          options: [
+            "L'Éveil",
+            "La Formation",
+            "L'Initiation"
+          ],
+          answerIndexes: [0, 2],
+          explanation:
+            "Le module rattache les U10-U13 aux étapes Éveil et Initiation. L'objectif évolue progressivement de s'amuser à jouer vers apprendre à s'entraîner."
+        },
+        {
+          question: "Face à la fragilité osseuse et musculaire possible chez les U12-U13, quelle adaptation le module met-il en avant ?",
+          options: [
+            "Privilégier les exercices de puissance sans prévention",
+            "Proposer des exercices de prévention de type ESVP"
+          ],
+          answerIndex: 1,
+          explanation:
+            "Le module met en avant une prévention de type ESVP. Elle s'inscrit dans une adaptation globale : observation, coordination, dosage de la charge et attention aux douleurs."
+        },
+        {
+          question: "En U12-U13, quel type de gestion faut-il privilégier selon le module ?",
+          options: [
+            "Privilégier uniquement l'alliance de fermeté et de souplesse dans la gestion du groupe",
+            "Privilégier un cadre sécurisant et éducatif",
+            "Privilégier un cadre directif et autoritaire"
+          ],
+          answerIndex: 1,
+          explanation:
+            "Le cadre sécurisant et éducatif constitue le repère central. Il peut associer des règles fermes, de l'écoute, de la souplesse et une responsabilisation progressive, sans devenir autoritaire."
         }
       ],
       situations: [
@@ -535,6 +1221,21 @@ window.CFI_REVISION_DATA = {
           ],
           explanation:
             "L'enfant a besoin d'un cadre sécurisant pour traverser les variations de développement."
+        },
+        {
+          id: "developpement-s3",
+          title: "U13 en plein pic de croissance",
+          prompt:
+            "Une joueuse U13 grandit rapidement. Elle se plaint régulièrement de douleurs, fatigue plus vite et perd confiance dans les exercices de coordination. Comment interviens-tu ?",
+          correction: [
+            "Écouter la joueuse et vérifier la nature ainsi que la durée des douleurs.",
+            "Réduire temporairement la charge et les répétitions traumatisantes.",
+            "Proposer de la prévention et une coordination progressive avec et sans ballon.",
+            "Valoriser ses choix et ses progrès plutôt que la comparer.",
+            "Suivre les procédures du club et orienter vers les responsables compétents si les douleurs persistent."
+          ],
+          explanation:
+            "Le pic de croissance peut perturber les repères et augmenter la fatigue. L'éducateur adapte, sécurise et transmet sans poser lui-même de diagnostic."
         }
       ]
     },

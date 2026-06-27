@@ -246,6 +246,7 @@ select:focus-visible {
 .oral-panel,
 .situation-panel,
 .read-panel,
+.lesson-focus,
 .audio-card,
 .plan-day,
 .beta-step,
@@ -1052,6 +1053,237 @@ p {
   border-color: var(--warning-panel-border);
 }
 
+.lesson-focus {
+  grid-column: 1 / -1;
+  padding: clamp(20px, 4vw, 32px);
+  border-color: var(--accent-panel-border);
+}
+
+.lesson-focus > p {
+  max-width: 850px;
+}
+
+.lesson-terms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 22px 0;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+
+.lesson-term {
+  padding: clamp(18px, 3vw, 28px);
+}
+
+.lesson-term + .lesson-term {
+  border-left: 1px solid var(--line);
+}
+
+.lesson-term h3 {
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+.lesson-term > strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.lesson-examples {
+  display: grid;
+  gap: 6px;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.lesson-stages-section {
+  margin: 24px 0;
+}
+
+.lesson-stages-section h3 {
+  margin-bottom: 12px;
+}
+
+.lesson-stages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 24px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  counter-reset: lesson-stage;
+}
+
+.lesson-stages li {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  counter-increment: lesson-stage;
+}
+
+.lesson-stages li::before {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  color: var(--on-primary);
+  font-weight: 900;
+  background: var(--primary);
+  border-radius: 4px;
+  content: counter(lesson-stage);
+  place-items: center;
+}
+
+.lesson-stages li div {
+  display: grid;
+  gap: 3px;
+}
+
+.lesson-stages li span {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.lesson-facets-section {
+  margin: 24px 0;
+}
+
+.lesson-facets-section > h3 {
+  margin-bottom: 12px;
+}
+
+.lesson-facets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+
+.lesson-facet {
+  padding: 18px 18px 0 0;
+}
+
+.lesson-facet + .lesson-facet {
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+}
+
+.lesson-facet h4 {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.lesson-facet p {
+  line-height: 1.45;
+}
+
+.lesson-public-module {
+  padding-top: 28px;
+  margin: 32px 0 24px;
+  border-top: 2px solid var(--primary);
+}
+
+.lesson-public-module > h3 {
+  margin-bottom: 8px;
+  color: var(--primary);
+}
+
+.lesson-public-module > p {
+  max-width: 850px;
+}
+
+.lesson-public-profile {
+  padding-top: 24px;
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.lesson-public-profile > h4 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 1.35rem;
+}
+
+.lesson-public-identity {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.35fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding: 18px;
+  margin: 20px 0;
+  background: var(--surface-soft);
+  border-left: 4px solid var(--accent);
+}
+
+.lesson-identity-list,
+.lesson-public-list {
+  display: grid;
+  gap: 7px;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.lesson-public-dimension {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.25fr) minmax(0, 1fr);
+  gap: 20px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.lesson-public-dimension h5 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.lesson-public-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.lesson-public-columns > div {
+  min-width: 0;
+}
+
+.lesson-public-columns > div > strong {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.lesson-profile-note {
+  padding: 14px 16px;
+  margin: 6px 0 0;
+  background: var(--warning-panel-bg);
+  border-left: 4px solid var(--accent);
+}
+
+.lesson-conclusion {
+  padding: clamp(18px, 3vw, 24px);
+  margin: 24px 0;
+  background: var(--surface-soft);
+  border-left: 4px solid var(--primary);
+}
+
+.lesson-conclusion h3 {
+  color: var(--primary);
+}
+
+.lesson-conclusion p:last-child {
+  margin-bottom: 0;
+}
+
+.lesson-reminder {
+  padding: 14px 16px;
+  margin: 0;
+  color: var(--ink);
+  background: var(--warning-panel-bg);
+  border-left: 4px solid var(--accent);
+}
+
 .read-panel p:last-child,
 .oral-panel p:last-child,
 .situation-panel p:last-child,
@@ -1509,9 +1741,47 @@ summary {
   .oral-panel,
   .situation-panel,
   .read-panel,
+  .lesson-focus,
   .share-message-panel,
   .plan-day {
     padding: 18px;
+  }
+
+  .lesson-terms {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-stages {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-facets {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-facet,
+  .lesson-facet + .lesson-facet {
+    padding: 16px 0;
+    border-left: 0;
+  }
+
+  .lesson-facet + .lesson-facet {
+    border-top: 1px solid var(--line);
+  }
+
+  .lesson-public-identity,
+  .lesson-public-dimension,
+  .lesson-public-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-public-dimension {
+    gap: 12px;
+  }
+
+  .lesson-term + .lesson-term {
+    border-top: 1px solid var(--line);
+    border-left: 0;
   }
 
   .stats-grid,

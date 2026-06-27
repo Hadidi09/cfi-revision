@@ -613,6 +613,22 @@
     return [...picked, ...rest].slice(0, limit);
   }
 
+  function themeQuestionSample(theme, limit = 10) {
+    const items = questionItemsForTheme(theme);
+    if (items.length <= limit) return shuffled(items);
+
+    const multipleAnswers = shuffled(
+      items.filter((item) => Array.isArray(item.question.answerIndexes))
+    ).slice(0, 2);
+    const selectedIds = new Set(multipleAnswers.map((item) => item.id));
+    const remaining = shuffled(items.filter((item) => !selectedIds.has(item.id)));
+
+    return shuffled([
+      ...multipleAnswers,
+      ...remaining.slice(0, limit - multipleAnswers.length)
+    ]);
+  }
+
   function weakQuestionItems(limit = 24) {
     const weakIds = new Set(weakThemes(DATA.themes.length).map((item) => item.theme.id));
     const items = allQuestionItems().filter((item) => weakIds.has(item.themeId));
@@ -2132,6 +2148,143 @@
     return renderSheet(theme);
   }
 
+  function renderPublicProfile(profile) {
+    return `
+      <section class="lesson-public-profile">
+        <h4>${esc(profile.title)}</h4>
+        <div class="lesson-public-identity">
+          <strong>Carte d'identité du module</strong>
+          ${list(profile.identity || [], "lesson-identity-list")}
+        </div>
+        <div class="lesson-public-dimensions">
+          ${(profile.dimensions || [])
+            .map(
+              (dimension) => `
+                <section class="lesson-public-dimension">
+                  <h5>${esc(dimension.title)}</h5>
+                  <div class="lesson-public-columns">
+                    <div>
+                      <strong>Caractéristiques et besoins</strong>
+                      ${list(dimension.characteristics || [], "lesson-public-list")}
+                    </div>
+                    <div>
+                      <strong>Incidences pédagogiques</strong>
+                      ${list(dimension.implications || [], "lesson-public-list")}
+                    </div>
+                  </div>
+                </section>
+              `
+            )
+            .join("")}
+        </div>
+        ${
+          profile.note
+            ? `<p class="lesson-profile-note"><strong>Repère du module :</strong> ${esc(profile.note)}</p>`
+            : ""
+        }
+      </section>
+    `;
+  }
+
+  function renderLessonFocus(theme) {
+    const focus = theme.lessonFocus;
+    if (!focus) return "";
+    return `
+      <article class="lesson-focus">
+        <span class="eyebrow">${esc(focus.eyebrow || "À retenir")}</span>
+        <h2>${esc(focus.title)}</h2>
+        <p>${esc(focus.intro)}</p>
+        <div class="lesson-terms">
+          ${(focus.terms || [])
+            .map(
+              (term) => `
+                <section class="lesson-term">
+                  <h3>${esc(term.title)}</h3>
+                  <p>${esc(term.definition)}</p>
+                  <strong>Exemples</strong>
+                  ${list(term.examples || [], "lesson-examples")}
+                </section>
+              `
+            )
+            .join("")}
+        </div>
+        ${
+          focus.stages?.length
+            ? `<section class="lesson-stages-section">
+                <h3>Les 4 stades du développement humain</h3>
+                <ol class="lesson-stages">
+                  ${focus.stages
+                    .map(
+                      (stage) => `
+                        <li>
+                          <div>
+                            <strong>${esc(stage.title)}</strong>
+                            <span>${esc(stage.note)}</span>
+                          </div>
+                        </li>
+                      `
+                    )
+                    .join("")}
+                </ol>
+              </section>`
+            : ""
+        }
+        ${
+          focus.facets?.length
+            ? `<section class="lesson-facets-section">
+                <h3>Les 3 facettes du développement humain</h3>
+                <div class="lesson-facets">
+                  ${focus.facets
+                    .map(
+                      (facet) => `
+                        <section class="lesson-facet">
+                          <h4>${esc(facet.title)}</h4>
+                          <p>${esc(facet.definition)}</p>
+                          <p><strong>À observer :</strong> ${esc(facet.coachFocus)}</p>
+                        </section>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </section>`
+            : ""
+        }
+        ${
+          focus.publicModule
+            ? `<section class="lesson-public-module">
+                <span class="eyebrow">Connaissance des publics</span>
+                <h3>${esc(focus.publicModule.title)}</h3>
+                <p>${esc(focus.publicModule.intro)}</p>
+                ${renderPublicProfile({
+                  title: "Profil U10-U11",
+                  identity: focus.publicModule.identity,
+                  dimensions: focus.publicModule.dimensions
+                })}
+                ${(focus.publicModule.additionalProfiles || [])
+                  .map(renderPublicProfile)
+                  .join("")}
+              </section>`
+            : ""
+        }
+        ${
+          focus.conclusion
+            ? `<section class="lesson-conclusion">
+                <h3>${esc(focus.conclusion.title)}</h3>
+                ${(focus.conclusion.paragraphs || [])
+                  .map((paragraph) => `<p>${esc(paragraph)}</p>`)
+                  .join("")}
+              </section>`
+            : ""
+        }
+        ${
+          focus.reminder
+            ? `<p class="lesson-reminder"><strong>Réflexe éducateur :</strong> ${esc(focus.reminder)}</p>`
+            : ""
+        }
+      </article>
+    `;
+  }
+
   function renderSheet(theme) {
     const state = themeState(theme.id);
     return `
@@ -2153,6 +2306,7 @@
           <h2>Erreurs à éviter</h2>
           ${list(theme.mistakes, "avoid-list")}
         </article>
+        ${renderLessonFocus(theme)}
       </section>
     `;
   }
@@ -2184,7 +2338,7 @@
         return quizSession;
       }
 
-      const items = shuffled(questionItemsForTheme(theme));
+      const items = themeQuestionSample(theme);
       quizSession = createQuizSession("theme", `QCM - ${theme.title}`, items, theme.id);
       saveActiveQuiz(quizSession);
     }

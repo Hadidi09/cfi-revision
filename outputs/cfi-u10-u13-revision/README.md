@@ -20,7 +20,7 @@ Cette version bêta doit pouvoir être partagée à plusieurs coachs ayant déj�
 - Mode intensif 3 jours : planning rapide de révision.
 - Diagnostic initial : test court pour repérer les priorités.
 - QCM par thème, QCM complet, QCM blanc final et questions par difficulté.
-- Simulation certification : 20 questions, 20 minutes, objectif 16/20.
+- Simulation certification : 20 questions, 20 minutes, objectif 16/20, avec 4 questions multi-réponses garanties et 60 secondes maximum par question.
 - Questions ratées sauvegardées automatiquement.
 - Tableau de bord : progression, scores, thèmes forts/faibles, dernière session.
 - Mode audio avec synthèse vocale du navigateur.
@@ -93,6 +93,8 @@ Paramètres :
 ## Format de certification
 
 La bêta affiche une section de rappel sur le format de certification indiqué par des IR2F : QCM de 20 questions, 20 minutes, une tentative, seuil indicatif de 16/20 et recommandation d’utiliser Chrome.
+
+Dans la simulation, chaque question dispose d'un compte à rebours de 60 secondes. Une réponse validée ouvre immédiatement la question suivante ; à zéro, la question est enregistrée comme ratée et le parcours continue automatiquement. Le chronomètre global reste limité à 20 minutes.
 
 Ces informations doivent être vérifiées avant l’épreuve auprès de la ligue, du district ou de l’IR2F concerné, car les modalités peuvent évoluer.
 

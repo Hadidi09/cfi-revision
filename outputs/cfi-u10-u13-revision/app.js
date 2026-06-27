@@ -305,6 +305,13 @@
     return session.timeLimitSeconds - (Date.now() - started) / 1000;
   }
 
+  function questionRemainingSeconds(session) {
+    if (!session?.questionTimeLimitSeconds) return null;
+    const started = new Date(session.questionStartedAt || Date.now()).getTime();
+    if (Number.isNaN(started)) return session.questionTimeLimitSeconds;
+    return session.questionTimeLimitSeconds - (Date.now() - started) / 1000;
+  }
+
   function list(items, className = "") {
     return `<ul class="${className}">${items.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`;
   }
@@ -621,7 +628,15 @@
   }
 
   function certificationExamQuestionItems() {
-    return balancedQuestionSample(20);
+    const all = allQuestionItems();
+    const multipleAnswers = shuffled(
+      all.filter((item) => Array.isArray(item.question.answerIndexes))
+    ).slice(0, 4);
+    const selectedIds = new Set(multipleAnswers.map((item) => item.id));
+    const singleAnswers = balancedQuestionSample(32).filter(
+      (item) => !selectedIds.has(item.id) && !Array.isArray(item.question.answerIndexes)
+    );
+    return shuffled([...multipleAnswers, ...singleAnswers.slice(0, 20 - multipleAnswers.length)]);
   }
 
   function masteredQuestionCount() {
@@ -643,6 +658,8 @@
       draftSelections: session.draftSelections || {},
       startedAt: session.startedAt,
       timeLimitSeconds: session.timeLimitSeconds || null,
+      questionStartedAt: session.questionStartedAt || null,
+      questionTimeLimitSeconds: session.questionTimeLimitSeconds || null,
       passScoreCount: session.passScoreCount || null,
       itemIds: session.items.map((item) => item.id),
       items: session.items
@@ -675,6 +692,9 @@
       draftSelections: saved.draftSelections || {},
       startedAt: saved.startedAt || new Date().toISOString(),
       timeLimitSeconds: saved.timeLimitSeconds || null,
+      questionStartedAt: saved.questionStartedAt || new Date().toISOString(),
+      questionTimeLimitSeconds:
+        saved.questionTimeLimitSeconds || (saved.type === "exam20" ? 60 : null),
       passScoreCount: saved.passScoreCount || null,
       items,
       finished: false
@@ -1402,6 +1422,7 @@
         <article class="read-panel accent">
           <h2>Format de certification à connaître</h2>
           <p>Les informations publiées par des IR2F indiquent une certification CFI sous forme de QCM de 20 questions, avec 20 minutes, une seule tentative et un seuil indicatif de 16/20. Utilise Chrome le jour J et vérifie toujours les consignes de ta ligue ou de ton district avant l’épreuve.</p>
+          <p><strong>Dans cette simulation :</strong> chaque question est limitée à 60 secondes. Une validation ou la fin du temps ouvre automatiquement la suivante.</p>
           <div class="hero-actions">
             <button class="btn primary" type="button" data-start-certification-exam>Faire la simulation 20 min</button>
             <a class="btn ghost" href="https://footbretagne.fff.fr/simple/certifications-cfi-les-points-essentiels-a-connaitre/" target="_blank" rel="noreferrer">Points essentiels</a>
@@ -1534,7 +1555,7 @@
         </button>
         <button class="quick-action" type="button" data-start-certification-exam>
           <strong>Simulation certification</strong>
-          <span>20 questions, 20 minutes, objectif 16/20</span>
+          <span>20 questions, 60 s maximum chacune, objectif 16/20</span>
         </button>
         <button class="quick-action" type="button" data-start-level="certification">
           <strong>Quiz certification</strong>
@@ -2148,6 +2169,8 @@
       items,
       startedAt: options.startedAt || new Date().toISOString(),
       timeLimitSeconds: options.timeLimitSeconds || null,
+      questionStartedAt: options.questionStartedAt || new Date().toISOString(),
+      questionTimeLimitSeconds: options.questionTimeLimitSeconds || null,
       passScoreCount: options.passScoreCount || null,
       finished: false
     };
@@ -2213,7 +2236,9 @@
       titleByKind[kind] || "QCM complet type certification",
       items,
       "",
-      kind === "exam20" ? { timeLimitSeconds: 20 * 60, passScoreCount: 16 } : {}
+      kind === "exam20"
+        ? { timeLimitSeconds: 20 * 60, questionTimeLimitSeconds: 60, passScoreCount: 16 }
+        : {}
     );
     saveActiveQuiz(quizSession);
     return quizSession;
@@ -2292,6 +2317,13 @@
       return renderQuizSummary(session);
     }
 
+    const questionRemaining = questionRemainingSeconds(session);
+    if (questionRemaining !== null && questionRemaining <= 0) {
+      expireCurrentQuestion(session);
+      if (session.finished) return renderQuizSummary(session);
+      return renderQuizSession(session);
+    }
+
     const item = session.items[session.index];
     const question = item.question;
     const answer = session.answers[session.index];
@@ -2302,17 +2334,35 @@
       : session.draftSelections?.[session.index] || [];
     const locked = Boolean(answer);
     const total = session.items.length;
+    const choiceInstruction = isMultiple
+      ? "Plusieurs réponses sont attendues. Sélectionne toutes les bonnes propositions."
+      : "Une seule réponse est attendue.";
+    const paceInstruction =
+      session.type === "exam20"
+        ? " Tu disposes de 60 secondes maximum. Après validation ou à zéro, la question suivante s'affiche automatiquement."
+        : "";
     return `
       <section class="quiz-panel">
         <span class="eyebrow">${esc(session.title)}</span>
         <div class="quiz-topline">
           <span>Question ${session.index + 1}/${total}</span>
           <strong>Score ${session.score}</strong>
-          ${remaining !== null ? `<strong class="timer-badge">Temps ${formatClock(remaining)}</strong>` : ""}
+          ${remaining !== null ? `<strong class="timer-badge">Temps total ${formatClock(remaining)}</strong>` : ""}
+          ${
+            questionRemaining !== null
+              ? `<strong class="timer-badge question-timer ${questionRemaining <= 10 ? "urgent" : ""}">
+                  Question ${formatClock(questionRemaining)}
+                </strong>`
+              : ""
+          }
         </div>
         ${progressBar((session.index / total) * 100, "Avancement du QCM")}
         <span class="question-theme">${esc(item.themeTitle)} · ${difficultyLabel(question.difficulty)}</span>
         <h2>${esc(question.question)}</h2>
+        <p class="choice-instruction ${isMultiple ? "multiple" : ""}">
+          <strong>${isMultiple ? "Choix multiple." : "Choix unique."}</strong>
+          ${esc(choiceInstruction + paceInstruction)}
+        </p>
         <div class="answers">
           ${question.options
             .map((option, index) => {
@@ -2344,7 +2394,13 @@
                 ${session.index === total - 1 ? "Voir le résumé" : "Question suivante"}
               </button>`
             : `<button class="btn primary large" type="button" data-validate-answer ${selectedIndexes.length ? "" : "disabled"}>
-                ${isMultiple ? "Valider mes réponses" : "Valider ma réponse"}
+                ${
+                  session.type === "exam20"
+                    ? "Valider et passer à la suivante"
+                    : isMultiple
+                      ? "Valider mes réponses"
+                      : "Valider ma réponse"
+                }
               </button>`
         }
       </section>
@@ -2355,6 +2411,34 @@
     if (a.length !== b.length) return false;
     const aSet = new Set(a);
     return b.every((value) => aSet.has(value));
+  }
+
+  function advanceQuizSession(session) {
+    if (session.index === session.items.length - 1) {
+      session.finished = true;
+      finishQuiz(session);
+      clearActiveQuiz();
+      return;
+    }
+    session.index += 1;
+    session.questionStartedAt = new Date().toISOString();
+    saveActiveQuiz(session);
+  }
+
+  function expireCurrentQuestion(session) {
+    const index = session.index;
+    if (!session.answers[index]) {
+      const answer = {
+        selectedIndex: null,
+        selectedIndexes: [],
+        correct: false,
+        timedOut: true
+      };
+      session.answers[index] = answer;
+      recordQuestionAnswer(session, session.items[index], answer);
+    }
+    advanceQuizSession(session);
+    if (!session.finished) showToast("Temps écoulé : passage à la question suivante.");
   }
 
   function markUnansweredAsMissed(session) {
@@ -3072,7 +3156,11 @@
       session.answers[session.index] = answerRecord;
       if (correct) session.score += 1;
       recordQuestionAnswer(session, session.items[session.index], answerRecord);
-      saveActiveQuiz(session);
+      if (session.type === "exam20") {
+        advanceQuizSession(session);
+      } else {
+        saveActiveQuiz(session);
+      }
       render();
       return;
     }
@@ -3080,14 +3168,7 @@
     if (target.dataset.nextQuestion !== undefined) {
       const session = quizSession;
       if (!session) return;
-      if (session.index === session.items.length - 1) {
-        session.finished = true;
-        finishQuiz(session);
-        clearActiveQuiz();
-      } else {
-        session.index += 1;
-        saveActiveQuiz(session);
-      }
+      advanceQuizSession(session);
       render();
       return;
     }

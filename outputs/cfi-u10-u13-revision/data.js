@@ -3193,6 +3193,196 @@ window.CFI_REVISION_DATA.officialProgram = [
     }
   ];
 
+  const multiSelectCases = [
+    {
+      themeId: "seance-u10-u13",
+      question: "Quelles décisions augmentent directement le temps d'apprentissage pendant une séance U10-U13 ?",
+      options: [
+        "Organiser des groupes réduits et limiter les files d'attente.",
+        "Donner un objectif de jeu simple et observable.",
+        "Multiplier les consignes avant de laisser jouer.",
+        "Adapter l'espace ou les règles selon les réussites observées.",
+        "Conserver l'organisation prévue même si les enfants restent inactifs."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "Une séance apprenante met rapidement les enfants en activité, donne un but clair et évolue à partir de ce que l'éducateur observe.",
+      principle: "Faire jouer, observer puis adapter pour multiplier les actions utiles.",
+      keywords: ["activité", "objectif", "observation", "adaptation"]
+    },
+    {
+      themeId: "posture-educateur",
+      question: "Un enfant échoue plusieurs fois. Quelles interventions relèvent d'une posture éducative positive ?",
+      options: [
+        "Réduire temporairement la difficulté.",
+        "Encourager un progrès précis plutôt que juger le résultat.",
+        "Le comparer au joueur qui réussit le mieux.",
+        "Poser une question courte pour l'aider à trouver une solution.",
+        "Résoudre systématiquement le problème à sa place."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "L'éducateur soutient la confiance, rend la réussite accessible et accompagne l'enfant vers une solution sans l'humilier.",
+      principle: "Adapter, encourager et rendre progressivement l'enfant acteur.",
+      keywords: ["bienveillance", "encouragement", "autonomie", "adaptation"]
+    },
+    {
+      themeId: "pedagogie-apprentissage",
+      question: "Quels choix favorisent réellement l'apprentissage par le jeu ?",
+      options: [
+        "Proposer un problème de jeu lié à l'objectif.",
+        "Faire varier une règle, un espace ou un rapport de force.",
+        "Interrompre chaque action pour corriger immédiatement.",
+        "Questionner brièvement les joueurs sur ce qu'ils ont observé.",
+        "Présenter toutes les solutions avant le début de la situation."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "Le jeu place les joueurs face à un problème, les variables orientent les comportements et le questionnement aide à comprendre sans casser l'activité.",
+      principle: "Créer un problème à résoudre, laisser agir, puis guider la compréhension.",
+      keywords: ["jeu", "variables", "questionnement", "compréhension"]
+    },
+    {
+      themeId: "developpement-enfant",
+      question: "Quelles attitudes tiennent compte des différences de croissance et de maturité chez les U10-U13 ?",
+      options: [
+        "Observer au-delà du seul âge civil.",
+        "Adapter certaines contraintes sans étiqueter les enfants.",
+        "Imposer exactement la même charge et la même difficulté à tous.",
+        "Valoriser l'engagement et les progrès individuels.",
+        "Déduire le manque d'envie d'une performance physique plus faible."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "Deux enfants du même âge peuvent avoir des maturités très différentes. L'observation et l'adaptation préservent confiance, sécurité et progression.",
+      principle: "Considérer l'enfant réel, pas seulement son âge ou sa performance du moment.",
+      keywords: ["croissance", "maturité", "observation", "équité"]
+    },
+    {
+      themeId: "securite",
+      question: "Avant et pendant une séance, quels réflexes participent directement à la sécurité du groupe ?",
+      options: [
+        "Vérifier l'état de l'espace et du matériel.",
+        "Adapter l'activité aux conditions et à l'état des joueurs.",
+        "Poursuivre le jeu lorsqu'un risque apparaît pour garder le rythme.",
+        "Connaître les personnes et procédures d'alerte du club.",
+        "Improviser une règle locale sans l'expliquer aux encadrants."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "La sécurité repose sur l'anticipation, l'adaptation et la connaissance du cadre d'alerte. Un risque identifié doit être traité avant de poursuivre.",
+      principle: "Prévenir, surveiller et arrêter ou adapter dès qu'un danger apparaît.",
+      keywords: ["prévention", "vigilance", "alerte", "adaptation"]
+    },
+    {
+      themeId: "challenge-criterium",
+      question: "Quelles préparations sont essentielles avant un challenge ou un critérium U10-U13 ?",
+      options: [
+        "Vérifier les règles et consignes locales applicables à la date de la rencontre.",
+        "Répartir clairement les rôles entre les adultes.",
+        "Construire l'organisation uniquement autour du classement.",
+        "Prévoir l'accueil, les circulations, les terrains et les temps de jeu.",
+        "Reprendre automatiquement le format utilisé la saison précédente."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "Une organisation fiable vérifie le cadre local actualisé, clarifie les responsabilités et anticipe les flux pour protéger le plaisir et la sécurité.",
+      principle: "Préparer le cadre, les rôles et l'accueil avant de penser au résultat.",
+      keywords: ["organisation", "règlement local", "accueil", "sécurité"]
+    },
+    {
+      themeId: "climat-entrainement",
+      question: "Quels comportements construisent un climat d'entraînement favorable aux apprentissages ?",
+      options: [
+        "Autoriser l'erreur et aider à en tirer un repère.",
+        "Formuler des retours précis sur les efforts et les choix.",
+        "Classer publiquement les joueurs après chaque exercice.",
+        "Faire respecter un cadre clair de parole et de comportement.",
+        "Punir tout le groupe dès qu'un enfant se trompe."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "Un climat positif associe droit à l'erreur, feedback utile et cadre collectif clair. La comparaison publique et la punition globale fragilisent la confiance.",
+      principle: "Sécuriser la parole et l'erreur pour favoriser engagement et progression.",
+      keywords: ["droit à l'erreur", "feedback", "cadre", "confiance"]
+    },
+    {
+      themeId: "gestion-parents",
+      question: "Quelles pratiques facilitent une relation constructive avec les parents ?",
+      options: [
+        "Expliquer en amont les rôles et les règles de fonctionnement.",
+        "Prévoir un canal et un moment adaptés pour les échanges.",
+        "Autoriser les consignes techniques depuis le bord du terrain.",
+        "Traiter un désaccord calmement, à l'écart des enfants.",
+        "Régler le conflit immédiatement lorsque l'émotion est forte."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "Un cadre annoncé, des échanges organisés et une discussion hors de la présence des enfants réduisent les tensions et protègent la place de chacun.",
+      principle: "Associer les parents au projet éducatif sans brouiller les rôles.",
+      keywords: ["communication", "rôles", "cadre", "calme"]
+    },
+    {
+      themeId: "violence-discrimination-respect",
+      question: "Face à une moquerie discriminatoire, quelles actions sont attendues de l'éducateur ?",
+      options: [
+        "Interrompre le comportement et protéger l'enfant visé.",
+        "Nommer clairement que le propos est contraire au cadre du club.",
+        "Attendre la prochaine séance pour éviter de dramatiser.",
+        "Transmettre les faits selon les procédures et aux personnes compétentes du club.",
+        "Demander uniquement à l'enfant visé d'ignorer la remarque."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "L'éducateur protège immédiatement, recadre sans ambiguïté et transmet la situation dans le cadre du club. La responsabilité ne doit jamais être reportée sur la victime.",
+      principle: "Protéger, recadrer et transmettre sans banaliser ni exposer la victime.",
+      keywords: ["protection", "discrimination", "recadrage", "transmission"]
+    },
+    {
+      themeId: "education-integree-pef",
+      question: "Quelles démarches correspondent à une véritable action d'éducation intégrée ou PEF ?",
+      options: [
+        "Relier un comportement éducatif à une situation vécue dans le football.",
+        "Faire agir les enfants puis organiser un retour court.",
+        "Remplacer régulièrement le temps de jeu par un long cours théorique.",
+        "Donner aux joueurs des rôles et des responsabilités adaptés.",
+        "Séparer totalement les valeurs éducatives de la séance sportive."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "L'éducation intégrée s'appuie sur des situations concrètes, des responsabilités et un court temps de verbalisation, sans déconnecter l'action éducative du jeu.",
+      principle: "Faire vivre une valeur dans l'activité avant de la mettre en mots.",
+      keywords: ["PEF", "responsabilité", "expérience", "verbalisation"]
+    },
+    {
+      themeId: "evaluation-action",
+      question: "Après une séance, quels éléments permettent d'évaluer utilement son action pédagogique ?",
+      options: [
+        "Comparer les comportements observés avec l'objectif annoncé.",
+        "Identifier ce qui a favorisé ou freiné l'activité des joueurs.",
+        "Juger la séance uniquement à partir du score du match final.",
+        "Noter un ajustement précis à tester lors de la prochaine séance.",
+        "Conserver la séance identique pour pouvoir terminer le programme prévu."
+      ],
+      answerIndexes: [0, 1, 3],
+      difficulty: "hard",
+      explanation:
+        "L'analyse relie l'objectif aux comportements réellement observés et débouche sur un ajustement concret. Le seul résultat final ne mesure pas l'apprentissage.",
+      principle: "Observer, analyser puis décider d'un ajustement réalisable.",
+      keywords: ["observation", "objectif", "analyse", "ajustement"]
+    }
+  ];
+
   const keywordsByTheme = {
     securite: ["sécurité", "prévention", "responsabilité", "cadre"],
     "violence-discrimination-respect": ["respect", "protection", "discrimination", "cadre"],
@@ -3228,7 +3418,7 @@ window.CFI_REVISION_DATA.officialProgram = [
       .filter(Boolean);
   }
 
-  for (const item of cases) {
+  for (const item of [...cases, ...multiSelectCases]) {
     const theme = window.CFI_REVISION_DATA.themes.find((entry) => entry.id === item.themeId);
     if (!theme || theme.quiz.some((question) => question.question === item.question)) continue;
     const { themeId, ...question } = item;

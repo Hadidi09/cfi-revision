@@ -20,6 +20,7 @@ Cette version bêta doit pouvoir être partagée à plusieurs coachs ayant déj�
 - Mode intensif 3 jours : planning rapide de révision.
 - Diagnostic initial : test court pour repérer les priorités.
 - QCM par thème, QCM complet, QCM blanc final et questions par difficulté.
+- Simulation certification : 20 questions, 20 minutes, objectif 16/20.
 - Questions ratées sauvegardées automatiquement.
 - Tableau de bord : progression, scores, thèmes forts/faibles, dernière session.
 - Mode audio avec synthèse vocale du navigateur.
@@ -88,6 +89,17 @@ Paramètres :
 - `data.js` : thèmes, fiches, QCM, corrections, cas pratiques, scripts audio.
 - `vercel.json` : configuration de déploiement statique.
 - `.vercelignore` : exclusions de fichiers locaux.
+
+## Format de certification
+
+La bêta affiche une section de rappel sur le format de certification indiqué par des IR2F : QCM de 20 questions, 20 minutes, une tentative, seuil indicatif de 16/20 et recommandation d’utiliser Chrome.
+
+Ces informations doivent être vérifiées avant l’épreuve auprès de la ligue, du district ou de l’IR2F concerné, car les modalités peuvent évoluer.
+
+Liens utiles :
+
+- Ligue Bretagne, certifications CFI : https://footbretagne.fff.fr/simple/certifications-cfi-les-points-essentiels-a-connaitre/
+- Ligue Corse IR2F, CFI U10-U13 : https://www.lcf-ir2f.com/pageFormation/51
 
 ## Modifier les contenus
 
@@ -168,6 +180,7 @@ Le même message est disponible dans l’application sur la page `Retour testeur
 - Questions ratées sauvegardées.
 - Mode audio fonctionnel.
 - QCM blanc fonctionnel.
+- Simulation certification 20 minutes fonctionnelle.
 - Contenus relus.
 - Page retour testeur disponible.
 - README complet.

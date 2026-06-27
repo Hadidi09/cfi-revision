@@ -15,6 +15,7 @@
   let quizSession = null;
   let availableVoices = [];
   let audioQueue = null;
+  let quizTimerTimeout = null;
 
   function defaultProgress() {
     return {
@@ -26,6 +27,7 @@
       errorQuizAttempts: [],
       diagnosticAttempts: [],
       finalQuizAttempts: [],
+      certificationExamAttempts: [],
       weakQuizAttempts: [],
       levelQuizAttempts: [],
       questionStats: {},
@@ -149,6 +151,7 @@
       errorQuizAttempts: saved.errorQuizAttempts || [],
       diagnosticAttempts: saved.diagnosticAttempts || [],
       finalQuizAttempts: saved.finalQuizAttempts || [],
+      certificationExamAttempts: saved.certificationExamAttempts || [],
       weakQuizAttempts: saved.weakQuizAttempts || [],
       levelQuizAttempts: saved.levelQuizAttempts || [],
       questionStats: saved.questionStats || {},
@@ -288,6 +291,20 @@
     }).format(date);
   }
 
+  function formatClock(totalSeconds) {
+    const seconds = Math.max(0, Math.ceil(totalSeconds));
+    const minutes = Math.floor(seconds / 60);
+    const rest = seconds % 60;
+    return `${minutes}:${String(rest).padStart(2, "0")}`;
+  }
+
+  function remainingSeconds(session) {
+    if (!session?.timeLimitSeconds) return null;
+    const started = new Date(session.startedAt || Date.now()).getTime();
+    if (Number.isNaN(started)) return session.timeLimitSeconds;
+    return session.timeLimitSeconds - (Date.now() - started) / 1000;
+  }
+
   function list(items, className = "") {
     return `<ul class="${className}">${items.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`;
   }
@@ -378,6 +395,11 @@
       type: "final",
       label: "QCM blanc final"
     }));
+    const certificationExamAttempts = (progress.certificationExamAttempts || []).map((attempt) => ({
+      ...attempt,
+      type: "exam20",
+      label: "Simulation certification"
+    }));
     const weakAttempts = (progress.weakQuizAttempts || []).map((attempt) => ({
       ...attempt,
       type: "weak",
@@ -403,7 +425,7 @@
       label: "Questions ratées"
     }));
 
-    return [...themeAttempts, ...fullAttempts, ...diagnosticAttempts, ...finalAttempts, ...weakAttempts, ...levelAttempts, ...errorAttempts].sort(
+    return [...themeAttempts, ...fullAttempts, ...diagnosticAttempts, ...finalAttempts, ...certificationExamAttempts, ...weakAttempts, ...levelAttempts, ...errorAttempts].sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
   }
@@ -598,6 +620,10 @@
     return balancedQuestionSample(40);
   }
 
+  function certificationExamQuestionItems() {
+    return balancedQuestionSample(20);
+  }
+
   function masteredQuestionCount() {
     return Object.values(progress.questionStats || {}).filter((item) => item.correctStreak >= 2).length;
   }
@@ -615,6 +641,9 @@
       score: session.score,
       answers: session.answers,
       draftSelections: session.draftSelections || {},
+      startedAt: session.startedAt,
+      timeLimitSeconds: session.timeLimitSeconds || null,
+      passScoreCount: session.passScoreCount || null,
       itemIds: session.items.map((item) => item.id),
       items: session.items
     };
@@ -644,6 +673,9 @@
       score: saved.score || 0,
       answers: saved.answers || [],
       draftSelections: saved.draftSelections || {},
+      startedAt: saved.startedAt || new Date().toISOString(),
+      timeLimitSeconds: saved.timeLimitSeconds || null,
+      passScoreCount: saved.passScoreCount || null,
       items,
       finished: false
     };
@@ -1216,6 +1248,7 @@
           <button class="btn secondary large" type="button" data-start-diagnostic>Diagnostic</button>
           <button class="btn secondary large" type="button" data-start-weak-qcm>Points faibles</button>
           <button class="btn secondary large" type="button" data-start-final-qcm>QCM blanc</button>
+          <button class="btn secondary large" type="button" data-start-certification-exam>Simulation 20 min</button>
           <button class="btn secondary large" type="button" data-start-errors>Revoir mes erreurs${missedCount ? ` (${missedCount})` : ""}</button>
           <button class="btn secondary large" type="button" data-route="program">Programme CFI</button>
           <button class="btn secondary large" type="button" data-route="feedback">Retour testeur</button>
@@ -1359,9 +1392,22 @@
         <p>Cette application sert à préparer le CFI U10-U13 avec des fiches courtes, des QCM, des corrections, des cas pratiques, de l’audio et un suivi automatique.</p>
         <div class="hero-actions">
           <button class="btn primary large" type="button" data-start-diagnostic>Commencer par le test de niveau</button>
+          <button class="btn secondary large" type="button" data-start-certification-exam>Simulation 20 questions</button>
           <button class="btn secondary large" type="button" data-route="free">Réviser en mode libre</button>
           <button class="btn ghost large" type="button" data-route="feedback">Retour testeur</button>
         </div>
+      </section>
+
+      <section class="official-info">
+        <article class="read-panel accent">
+          <h2>Format de certification à connaître</h2>
+          <p>Les informations publiées par des IR2F indiquent une certification CFI sous forme de QCM de 20 questions, avec 20 minutes, une seule tentative et un seuil indicatif de 16/20. Utilise Chrome le jour J et vérifie toujours les consignes de ta ligue ou de ton district avant l’épreuve.</p>
+          <div class="hero-actions">
+            <button class="btn primary" type="button" data-start-certification-exam>Faire la simulation 20 min</button>
+            <a class="btn ghost" href="https://footbretagne.fff.fr/simple/certifications-cfi-les-points-essentiels-a-connaitre/" target="_blank" rel="noreferrer">Points essentiels</a>
+            <a class="btn ghost" href="https://www.lcf-ir2f.com/pageFormation/51" target="_blank" rel="noreferrer">Fiche CFI U10-U13</a>
+          </div>
+        </article>
       </section>
 
       ${renderBetaJourney()}
@@ -1410,6 +1456,9 @@
           <div class="hero-actions">
             <button class="btn primary large" type="button" data-start-diagnostic>
               ${diagnostic ? "Refaire le diagnostic" : "Faire le diagnostic"}
+            </button>
+            <button class="btn primary large" type="button" data-start-certification-exam>
+              Simulation certification 20 min
             </button>
             <button class="btn primary large" type="button" data-route="free">
               Réviser librement
@@ -1482,6 +1531,10 @@
         <button class="quick-action" type="button" data-start-final-qcm>
           <strong>QCM blanc final</strong>
           <span>40 questions mélangées, objectif 80%</span>
+        </button>
+        <button class="quick-action" type="button" data-start-certification-exam>
+          <strong>Simulation certification</strong>
+          <span>20 questions, 20 minutes, objectif 16/20</span>
         </button>
         <button class="quick-action" type="button" data-start-level="certification">
           <strong>Quiz certification</strong>
@@ -2083,7 +2136,7 @@
     `;
   }
 
-  function createQuizSession(type, title, items, themeId = "") {
+  function createQuizSession(type, title, items, themeId = "", options = {}) {
     return {
       type,
       title,
@@ -2093,6 +2146,9 @@
       answers: [],
       draftSelections: {},
       items,
+      startedAt: options.startedAt || new Date().toISOString(),
+      timeLimitSeconds: options.timeLimitSeconds || null,
+      passScoreCount: options.passScoreCount || null,
       finished: false
     };
   }
@@ -2128,6 +2184,8 @@
           ? diagnosticQuestionItems()
           : kind === "final"
             ? finalExamQuestionItems()
+            : kind === "exam20"
+              ? certificationExamQuestionItems()
             : kind === "weak"
               ? weakQuestionItems()
               : kind === "certification"
@@ -2141,6 +2199,7 @@
       errors: "Questions ratées",
       diagnostic: "Diagnostic initial",
       final: "QCM blanc final",
+      exam20: "Simulation certification 20 min",
       weak: "Réviser mes points faibles",
       certification: "Quiz certification",
       easy: "Quiz facile - bases",
@@ -2152,7 +2211,9 @@
     quizSession = createQuizSession(
       kind,
       titleByKind[kind] || "QCM complet type certification",
-      items
+      items,
+      "",
+      kind === "exam20" ? { timeLimitSeconds: 20 * 60, passScoreCount: 16 } : {}
     );
     saveActiveQuiz(quizSession);
     return quizSession;
@@ -2222,6 +2283,15 @@
       return renderQuizSummary(session);
     }
 
+    const remaining = remainingSeconds(session);
+    if (remaining !== null && remaining <= 0) {
+      markUnansweredAsMissed(session);
+      session.finished = true;
+      finishQuiz(session);
+      clearActiveQuiz();
+      return renderQuizSummary(session);
+    }
+
     const item = session.items[session.index];
     const question = item.question;
     const answer = session.answers[session.index];
@@ -2238,6 +2308,7 @@
         <div class="quiz-topline">
           <span>Question ${session.index + 1}/${total}</span>
           <strong>Score ${session.score}</strong>
+          ${remaining !== null ? `<strong class="timer-badge">Temps ${formatClock(remaining)}</strong>` : ""}
         </div>
         ${progressBar((session.index / total) * 100, "Avancement du QCM")}
         <span class="question-theme">${esc(item.themeTitle)} · ${difficultyLabel(question.difficulty)}</span>
@@ -2286,6 +2357,32 @@
     return b.every((value) => aSet.has(value));
   }
 
+  function markUnansweredAsMissed(session) {
+    session.items.forEach((item, index) => {
+      if (session.answers[index]) return;
+      session.answers[index] = {
+        selectedIndex: null,
+        selectedIndexes: [],
+        correct: false,
+        timedOut: true
+      };
+      recordQuestionAnswer(session, item, session.answers[index]);
+    });
+  }
+
+  function scheduleQuizTimer() {
+    if (quizTimerTimeout) {
+      window.clearTimeout(quizTimerTimeout);
+      quizTimerTimeout = null;
+    }
+    if (!quizSession?.timeLimitSeconds || quizSession.finished) return;
+    const route = currentRoute();
+    if (route.view !== "quiz" && !(route.view === "theme" && route.mode === "qcm")) return;
+    quizTimerTimeout = window.setTimeout(() => {
+      if (quizSession?.timeLimitSeconds) render();
+    }, 1000);
+  }
+
   function reviewThemesFromMissed(missed) {
     const grouped = new Map();
     for (const { item } of missed) {
@@ -2328,6 +2425,8 @@
           ? "Diagnostic terminé"
           : session.type === "final"
             ? "QCM blanc final terminé"
+            : session.type === "exam20"
+              ? "Simulation certification terminée"
             : session.type === "weak"
               ? "Points faibles travaillés"
         : session.type === "errors"
@@ -2341,12 +2440,17 @@
         : percent >= 80
           ? "Presque prêt"
           : "À revoir avant certification";
+    const passMessage = session.passScoreCount
+      ? session.score >= session.passScoreCount
+        ? `Seuil simulé atteint : ${session.score}/${total}.`
+        : `Seuil simulé non atteint : vise au moins ${session.passScoreCount}/${total}.`
+      : "";
 
     return `
       <section class="quiz-panel summary">
         <span class="eyebrow">${esc(title)}</span>
         <h2>${session.score}/${total} - ${pct(percent)}</h2>
-        <p>${session.type === "final" ? esc(readiness) : percent >= DATA.passScore ? "Objectif atteint. Tu peux passer à la suite." : "À revoir tranquillement : reprends la fiche puis relance le QCM."}</p>
+        <p>${session.passScoreCount ? esc(passMessage) : session.type === "final" ? esc(readiness) : percent >= DATA.passScore ? "Objectif atteint. Tu peux passer à la suite." : "À revoir tranquillement : reprends la fiche puis relance le QCM."}</p>
         ${progressBar(percent, "Score du QCM")}
         ${
           missed.length
@@ -2367,7 +2471,7 @@
             : `<div class="feedback good"><strong>Sans faute</strong><p>Tu as répondu correctement à toutes les questions de cette session.</p></div>`
         }
         ${
-          ["full", "final", "diagnostic", "weak", "certification", "easy", "medium", "hard"].includes(session.type)
+          ["full", "final", "exam20", "diagnostic", "weak", "certification", "easy", "medium", "hard"].includes(session.type)
             ? `<div class="review-themes">
                 <h3>Résultat par thème</h3>
                 ${themeResults
@@ -2432,6 +2536,14 @@
       `;
     }
 
+    if (session.type === "exam20") {
+      return `
+        <button class="btn primary large" type="button" data-start-certification-exam>Refaire la simulation 20 min</button>
+        <button class="btn secondary large" type="button" data-start-errors>Revoir mes erreurs</button>
+        <button class="btn ghost large" type="button" data-route="dashboard">Tableau de bord</button>
+      `;
+    }
+
     if (session.type === "final" || session.type === "weak") {
       return `
         <button class="btn primary large" type="button" data-start-final-qcm>QCM blanc final</button>
@@ -2478,6 +2590,8 @@
       progress.diagnosticAttempts.push(attempt);
     } else if (session.type === "final") {
       progress.finalQuizAttempts.push(attempt);
+    } else if (session.type === "exam20") {
+      progress.certificationExamAttempts.push(attempt);
     } else if (session.type === "weak") {
       progress.weakQuizAttempts.push(attempt);
     } else if (["easy", "medium", "hard", "certification"].includes(session.type)) {
@@ -2830,6 +2944,11 @@
       return;
     }
 
+    if (target.dataset.startCertificationExam !== undefined) {
+      startGlobalQuiz("exam20");
+      return;
+    }
+
     if (target.dataset.startWeakQcm !== undefined) {
       startGlobalQuiz("weak");
       return;
@@ -3059,6 +3178,10 @@
 
   function render() {
     const route = currentRoute();
+    if (quizTimerTimeout) {
+      window.clearTimeout(quizTimerTimeout);
+      quizTimerTimeout = null;
+    }
     updateNav();
     rememberRoute(route);
 
@@ -3093,6 +3216,7 @@
     }
 
     app.focus({ preventScroll: true });
+    scheduleQuizTimer();
   }
 
   document.addEventListener("click", handleClick);
